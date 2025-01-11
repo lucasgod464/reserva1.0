@@ -80,7 +80,6 @@ export default function Reserva() {
           criancas: criancas.filter((_, index) => nomes[index].trim() !== ''),
           telefone,
           pessoas,
-          chave_pix: chavePix,
           comprovante: comprovante ? comprovante.name : null,
           valor_total: valorTotal
         }])
