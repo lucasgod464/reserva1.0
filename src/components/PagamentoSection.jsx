@@ -1,8 +1,8 @@
 import React from 'react';
 
 const PagamentoSection = ({
-  chavePix,
-  tipoChavePix,
+  chavepix,
+  tipo_chavepix,
   valorTotal,
   handleClickPix,
   mostrarAviso,
@@ -20,8 +20,8 @@ const PagamentoSection = ({
     <div style={styles.pagamentoContainer}>
       <h3 style={styles.pagamentoTitle}>Pagamento</h3>
       <div style={styles.pixContainer} onClick={handleClickPix}>
-        <strong>Tipo PIX:</strong> {tiposChavePix[tipoChavePix]}<br />
-        <strong>Chave PIX:</strong> {chavePix}
+        <strong>Tipo PIX:</strong> {tiposChavePix[tipo_chavepix]}<br />
+        <strong>Chave PIX:</strong> {chavepix}
       </div>
       {mostrarAviso && (
         <div style={styles.aviso}>

@@ -15,8 +15,8 @@ const Reserva = () => {
   const [precos, setPrecos] = useState({ adulto: 69.90, crianca: 34.95 });
   const [cupom, setCupom] = useState('');
   const [descontoAplicado, setDescontoAplicado] = useState(0);
-  const [chavePix, setChavePix] = useState('');
-  const [tipoChavePix, setTipoChavePix] = useState('cpf');
+  const [chavepix, setChavepix] = useState('');
+  const [tipo_chavepix, setTipoChavepix] = useState('cpf');
   const [cuponsDisponiveis, setCuponsDisponiveis] = useState([]);
 
   useEffect(() => {
@@ -31,8 +31,8 @@ const Reserva = () => {
 
     if (!error) {
       setPrecos(data);
-      setChavePix(data.chave_pix);
-      setTipoChavePix(data.tipo_chave_pix || 'cpf');
+      setChavepix(data.chave_pix);
+      setTipoChavepix(data.tipo_chave_pix || 'cpf');
       setCuponsDisponiveis(data.cupons || []);
     }
   }
@@ -87,6 +87,22 @@ const Reserva = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let comprovanteNome = null;
+
+      // Se um comprovante foi enviado, faz o upload para o Supabase Storage
+      if (comprovante) {
+        const extensao = comprovante.name.split('.').pop();
+        comprovanteNome = `comprovante_${Date.now()}.${extensao}`;
+
+        const { error: uploadError } = await supabase
+          .storage
+          .from('comprovantes')
+          .upload(comprovanteNome, comprovante);
+
+        if (uploadError) throw uploadError;
+      }
+
+      // Salva a reserva no banco de dados
       const { data, error } = await supabase
         .from('reservas')
         .insert([{
@@ -94,10 +110,10 @@ const Reserva = () => {
           criancas: criancas.filter((_, index) => nomes[index].trim() !== ''),
           telefone,
           pessoas,
-          comprovante: comprovante ? comprovante.name : null,
+          comprovante: comprovanteNome,
           valor_total: valorTotal,
-          chave_pix: chavePix,
-          tipo_chave_pix: tipoChavePix,
+          chavepix: chavepix,
+          tipo_chavepix: tipo_chavepix,
           cupom: cupom || null,
           desconto: descontoAplicado
         }])
@@ -120,7 +136,7 @@ const Reserva = () => {
 
   const handleClickPix = () => {
     setMostrarPopupPix(true);
-    navigator.clipboard.writeText(chavePix);
+    navigator.clipboard.writeText(chavepix);
     setMostrarAviso(true);
     setTimeout(() => setMostrarAviso(false), 2000);
   };
@@ -149,8 +165,8 @@ const Reserva = () => {
       />
 
       <PagamentoSection
-        chavePix={chavePix}
-        tipoChavePix={tipoChavePix}
+        chavepix={chavepix}
+        tipo_chavepix={tipo_chavepix}
         valorTotal={valorTotal}
         handleClickPix={handleClickPix}
         mostrarAviso={mostrarAviso}

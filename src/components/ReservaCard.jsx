@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ReservaCard = ({ reserva, index }) => {
+const ReservaCard = ({ reserva, index, onAprovar }) => {
   const calcularTotais = (criancas) => {
     const totalAdultos = criancas.filter((crianca) => !crianca).length;
     const totalCriancas = criancas.filter((crianca) => crianca).length;
@@ -8,6 +8,14 @@ const ReservaCard = ({ reserva, index }) => {
   };
 
   const { totalAdultos, totalCriancas } = calcularTotais(reserva.criancas);
+
+  // URL do comprovante no Supabase Storage
+  const comprovanteUrl = `https://vpteneqwgfifezlnzxtu.supabase.co/storage/v1/object/public/comprovantes/${reserva.comprovante}`;
+
+  const handleVerComprovante = () => {
+    // Abre o comprovante em uma nova aba
+    window.open(comprovanteUrl, '_blank');
+  };
 
   return (
     <div style={styles.reservaCard}>
@@ -32,11 +40,27 @@ const ReservaCard = ({ reserva, index }) => {
             <strong>Crianças:</strong> {totalCriancas}
           </div>
         </div>
-        <p><strong>Chave PIX:</strong> {reserva.chave_pix}</p>
+        <p><strong>Chave PIX:</strong> {reserva.chavepix}</p>
         <p><strong>Comprovante:</strong> {reserva.comprovante || 'Não enviado'}</p>
         <p><strong>Cupom Aplicado:</strong> {reserva.cupom || 'Nenhum'}</p>
         <p><strong>Desconto Aplicado:</strong> {reserva.desconto || 0}%</p>
       </div>
+      {reserva.comprovante && (
+        <button 
+          style={styles.comprovanteButton}
+          onClick={handleVerComprovante}
+        >
+          Ver Comprovante
+        </button>
+      )}
+      {!reserva.aprovada && (
+        <button 
+          style={styles.aprovarButton}
+          onClick={onAprovar}
+        >
+          Aprovar Reserva
+        </button>
+      )}
     </div>
   );
 };
@@ -75,6 +99,33 @@ const styles = {
     borderRadius: '5px',
     textAlign: 'center',
     color: '#8B4513'
+  },
+  comprovanteButton: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#8B4513',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '10px',
+    marginRight: '10px',
+    '&:hover': {
+      backgroundColor: '#A0522D'
+    }
+  },
+  aprovarButton: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#228B22',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '10px',
+    '&:hover': {
+      backgroundColor: '#1E7A1E'
+    }
   }
 };
 

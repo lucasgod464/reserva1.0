@@ -11,6 +11,7 @@ const Admin = () => {
   const [tipoChavePix, setTipoChavePix] = useState('cpf');
   const [cupons, setCupons] = useState([]);
   const [novoCupom, setNovoCupom] = useState({ nome: '', desconto: 0 });
+  const [abaAtiva, setAbaAtiva] = useState('pendentes');
 
   useEffect(() => {
     fetchReservas();
@@ -72,6 +73,23 @@ const Admin = () => {
     setCupons(novosCupons);
   };
 
+  const aprovarReserva = async (id) => {
+    const { error } = await supabase
+      .from('reservas')
+      .update({ aprovada: true })
+      .eq('id', id);
+
+    if (!error) {
+      fetchReservas();
+      alert('Reserva aprovada com sucesso!');
+    } else {
+      alert('Erro ao aprovar reserva: ' + error.message);
+    }
+  };
+
+  const reservasPendentes = reservas.filter((reserva) => !reserva.aprovada);
+  const reservasAprovadas = reservas.filter((reserva) => reserva.aprovada);
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Painel de Administração</h1>
@@ -93,18 +111,49 @@ const Admin = () => {
         salvarConfiguracoes={salvarConfiguracoes}
       />
 
-      <h2 style={styles.subtitle}>Reservas Cadastradas</h2>
-      {reservas.length === 0 ? (
-        <p style={styles.semReservas}>Nenhuma reserva cadastrada.</p>
+      <div style={styles.tabsContainer}>
+        <button
+          style={abaAtiva === 'pendentes' ? styles.tabAtiva : styles.tab}
+          onClick={() => setAbaAtiva('pendentes')}
+        >
+          Reservas Pendentes
+        </button>
+        <button
+          style={abaAtiva === 'aprovadas' ? styles.tabAtiva : styles.tab}
+          onClick={() => setAbaAtiva('aprovadas')}
+        >
+          Reservas Aprovadas
+        </button>
+      </div>
+
+      {abaAtiva === 'pendentes' ? (
+        <div style={styles.reservasContainer}>
+          {reservasPendentes.length === 0 ? (
+            <p style={styles.semReservas}>Nenhuma reserva pendente.</p>
+          ) : (
+            reservasPendentes.map((reserva, index) => (
+              <ReservaCard
+                key={reserva.id}
+                reserva={reserva}
+                index={index}
+                onAprovar={() => aprovarReserva(reserva.id)}
+              />
+            ))
+          )}
+        </div>
       ) : (
         <div style={styles.reservasContainer}>
-          {reservas.map((reserva, index) => (
-            <ReservaCard
-              key={reserva.id}
-              reserva={reserva}
-              index={index}
-            />
-          ))}
+          {reservasAprovadas.length === 0 ? (
+            <p style={styles.semReservas}>Nenhuma reserva aprovada.</p>
+          ) : (
+            reservasAprovadas.map((reserva, index) => (
+              <ReservaCard
+                key={reserva.id}
+                reserva={reserva}
+                index={index}
+              />
+            ))
+          )}
         </div>
       )}
     </div>
@@ -125,20 +174,42 @@ const styles = {
     color: '#8B4513',
     marginBottom: '20px'
   },
-  subtitle: {
-    textAlign: 'center',
-    color: '#8B4513',
-    marginBottom: '30px'
+  tabsContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '10px',
+    marginBottom: '20px'
   },
-  semReservas: {
-    textAlign: 'center',
-    color: '#8B4513',
-    fontSize: '18px'
+  tab: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#8B4513',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#A0522D'
+    }
+  },
+  tabAtiva: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#A0522D',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer'
   },
   reservasContainer: {
     display: 'flex',
     flexDirection: 'column',
     gap: '20px'
+  },
+  semReservas: {
+    textAlign: 'center',
+    color: '#8B4513',
+    fontSize: '18px'
   }
 };
 
