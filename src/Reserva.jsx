@@ -81,7 +81,8 @@ export default function Reserva() {
           telefone,
           pessoas,
           comprovante: comprovante ? comprovante.name : null,
-          valor_total: valorTotal
+          valor_total: valorTotal,
+          chavepix: chavePix
         }])
         .select();
 
