@@ -73,8 +73,8 @@ const Admin = () => {
         halign: 'center'
       },
       headStyles: {
-        fillColor: [135, 206, 235], // Azul claro
-        textColor: [0, 0, 0]
+        fillColor: [139, 69, 19], // Terracota
+        textColor: [255, 255, 255] // Texto branco
       }
     });
 
