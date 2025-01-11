@@ -7,45 +7,30 @@ export default function Reserva() {
   const [criancas, setCriancas] = useState([false]);
   const [telefone, setTelefone] = useState('');
   const [comprovante, setComprovante] = useState(null);
-  const [chavePix, setChavePix] = useState(gerarChavePix());
   const [mostrarAviso, setMostrarAviso] = useState(false);
   const [mostrarPopupPix, setMostrarPopupPix] = useState(false);
   const [precos, setPrecos] = useState({ adulto: 69.90, crianca: 34.95 });
+  const [cupom, setCupom] = useState('');
+  const [descontoAplicado, setDescontoAplicado] = useState(0);
+  const [chavePix, setChavePix] = useState('');
+  const [cuponsDisponiveis, setCuponsDisponiveis] = useState([]);
 
   useEffect(() => {
-    fetchPrecos();
+    fetchConfiguracoes();
   }, []);
 
-  async function fetchPrecos() {
+  async function fetchConfiguracoes() {
     const { data, error } = await supabase
-      .from('precos')
+      .from('configuracoes')
       .select('*')
       .single();
 
     if (!error) {
       setPrecos(data);
+      setChavePix(data.chave_pix);
+      setCuponsDisponiveis(data.cupons || []);
     }
   }
-
-  function gerarChavePix() {
-    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let chave = '';
-    for (let i = 0; i < 20; i++) {
-      chave += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-    }
-    return chave;
-  }
-
-  const copiarChavePix = () => {
-    const input = document.createElement('input');
-    input.value = chavePix;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-    setMostrarAviso(true);
-    setTimeout(() => setMostrarAviso(false), 2000);
-  };
 
   const handlePessoasChange = (e) => {
     const numPessoas = parseInt(e.target.value, 10);
@@ -70,6 +55,26 @@ export default function Reserva() {
     setComprovante(e.target.files[0]);
   };
 
+  const handleCupomChange = (e) => {
+    setCupom(e.target.value);
+  };
+
+  const aplicarCupom = () => {
+    const cupomValido = cuponsDisponiveis.find(c => c.nome === cupom);
+    if (cupomValido) {
+      setDescontoAplicado(cupomValido.desconto);
+      alert(`Cupom "${cupomValido.nome}" aplicado com sucesso!`);
+    } else {
+      setDescontoAplicado(0);
+      alert('Cupom inválido');
+    }
+  };
+
+  const valorTotal = (nomes.reduce((total, _, index) => {
+    if (index === 0) return total + precos.adulto;
+    return total + (criancas[index] ? precos.crianca : precos.adulto);
+  }, 0) * (1 - descontoAplicado/100)).toFixed(2);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -82,7 +87,9 @@ export default function Reserva() {
           pessoas,
           comprovante: comprovante ? comprovante.name : null,
           valor_total: valorTotal,
-          chavepix: chavePix
+          chave_pix: chavePix,
+          cupom: cupom || null,
+          desconto: descontoAplicado
         }])
         .select();
 
@@ -94,20 +101,18 @@ export default function Reserva() {
       setCriancas([false]);
       setTelefone('');
       setComprovante(null);
-      setChavePix(gerarChavePix());
+      setCupom('');
+      setDescontoAplicado(0);
     } catch (error) {
       alert('Erro ao salvar a reserva: ' + error.message);
     }
   };
 
-  const valorTotal = nomes.reduce((total, _, index) => {
-    if (index === 0) return total + precos.adulto;
-    return total + (criancas[index] ? precos.crianca : precos.adulto);
-  }, 0).toFixed(2);
-
   const handleClickPix = () => {
     setMostrarPopupPix(true);
-    copiarChavePix();
+    navigator.clipboard.writeText(chavePix);
+    setMostrarAviso(true);
+    setTimeout(() => setMostrarAviso(false), 2000);
   };
 
   const fecharPopupPix = () => {
@@ -166,6 +171,33 @@ export default function Reserva() {
             onChange={(e) => setTelefone(e.target.value)}
             required
           />
+        </div>
+
+        <div style={styles.cupomContainer}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Cupom de Desconto:</label>
+            <div style={styles.cupomInputGroup}>
+              <input
+                style={styles.cupomInput}
+                type="text"
+                placeholder="Digite seu cupom"
+                value={cupom}
+                onChange={handleCupomChange}
+              />
+              <button 
+                type="button" 
+                style={styles.cupomButton}
+                onClick={aplicarCupom}
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+          {descontoAplicado > 0 && (
+            <div style={styles.descontoAplicado}>
+              Cupom aplicado: {cupom} ({descontoAplicado}% de desconto)
+            </div>
+          )}
         </div>
 
         <div style={styles.pagamentoContainer}>
@@ -267,6 +299,42 @@ const styles = {
     gap: '8px',
     fontSize: '14px',
     color: '#8B4513'
+  },
+  cupomContainer: {
+    marginTop: '10px',
+    padding: '15px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC'
+  },
+  cupomInputGroup: {
+    display: 'flex',
+    gap: '10px'
+  },
+  cupomInput: {
+    flex: 1,
+    padding: '12px',
+    fontSize: '16px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC'
+  },
+  cupomButton: {
+    padding: '12px 20px',
+    fontSize: '16px',
+    backgroundColor: '#8B4513',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#A0522D'
+    }
+  },
+  descontoAplicado: {
+    marginTop: '10px',
+    color: '#228B22',
+    fontSize: '14px'
   },
   pagamentoContainer: {
     marginTop: '20px',

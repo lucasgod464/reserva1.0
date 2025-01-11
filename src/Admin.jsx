@@ -5,10 +5,13 @@ export default function Admin() {
   const [reservas, setReservas] = useState([]);
   const [precoAdulto, setPrecoAdulto] = useState(69.90);
   const [precoCrianca, setPrecoCrianca] = useState(34.95);
+  const [chavePix, setChavePix] = useState('');
+  const [cupons, setCupons] = useState([]);
+  const [novoCupom, setNovoCupom] = useState({ nome: '', desconto: 0 });
 
   useEffect(() => {
     fetchReservas();
-    fetchPrecos();
+    fetchConfiguracoes();
   }, []);
 
   const fetchReservas = async () => {
@@ -20,28 +23,48 @@ export default function Admin() {
     if (!error) setReservas(data);
   };
 
-  const fetchPrecos = async () => {
+  const fetchConfiguracoes = async () => {
     const { data, error } = await supabase
-      .from('precos')
+      .from('configuracoes')
       .select('*')
       .single();
 
     if (!error) {
       setPrecoAdulto(data.adulto);
       setPrecoCrianca(data.crianca);
+      setChavePix(data.chave_pix);
+      setCupons(data.cupons || []);
     }
   };
 
-  const salvarPrecos = async () => {
+  const salvarConfiguracoes = async () => {
     const { error } = await supabase
-      .from('precos')
-      .upsert({ id: 1, adulto: precoAdulto, crianca: precoCrianca });
+      .from('configuracoes')
+      .upsert({ 
+        id: 1, 
+        adulto: precoAdulto, 
+        crianca: precoCrianca,
+        chave_pix: chavePix,
+        cupons: cupons
+      });
 
     if (!error) {
-      alert('Preços atualizados com sucesso!');
+      alert('Configurações atualizadas com sucesso!');
     } else {
-      alert('Erro ao atualizar preços: ' + error.message);
+      alert('Erro ao atualizar configurações: ' + error.message);
     }
+  };
+
+  const adicionarCupom = () => {
+    if (novoCupom.nome && novoCupom.desconto > 0) {
+      setCupons([...cupons, novoCupom]);
+      setNovoCupom({ nome: '', desconto: 0 });
+    }
+  };
+
+  const removerCupom = (index) => {
+    const novosCupons = cupons.filter((_, i) => i !== index);
+    setCupons(novosCupons);
   };
 
   const calcularTotais = (criancas) => {
@@ -55,7 +78,8 @@ export default function Admin() {
       <h1 style={styles.title}>Painel de Administração</h1>
 
       <div style={styles.configuracaoContainer}>
-        <h2 style={styles.subtitle}>Configurar Preços</h2>
+        <h2 style={styles.subtitle}>Configurações</h2>
+        
         <div style={styles.inputGroup}>
           <label style={styles.label}>Preço para Adulto:</label>
           <input
@@ -66,6 +90,7 @@ export default function Admin() {
             onChange={(e) => setPrecoAdulto(parseFloat(e.target.value))}
           />
         </div>
+        
         <div style={styles.inputGroup}>
           <label style={styles.label}>Preço para Criança:</label>
           <input
@@ -76,8 +101,72 @@ export default function Admin() {
             onChange={(e) => setPrecoCrianca(parseFloat(e.target.value))}
           />
         </div>
-        <button style={styles.button} onClick={salvarPrecos}>
-          Salvar Preços
+        
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Chave PIX:</label>
+          <input
+            style={styles.input}
+            type="text"
+            value={chavePix}
+            onChange={(e) => setChavePix(e.target.value)}
+          />
+        </div>
+        
+        <div style={styles.cuponsContainer}>
+          <h3 style={styles.subtitle}>Cupons de Desconto</h3>
+          
+          <div style={styles.novoCupomContainer}>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Nome do Cupom:</label>
+              <input
+                style={styles.input}
+                type="text"
+                value={novoCupom.nome}
+                onChange={(e) => setNovoCupom({ ...novoCupom, nome: e.target.value })}
+              />
+            </div>
+            
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Desconto (%):</label>
+              <input
+                style={styles.input}
+                type="number"
+                min="0"
+                max="100"
+                value={novoCupom.desconto}
+                onChange={(e) => setNovoCupom({ ...novoCupom, desconto: parseFloat(e.target.value) })}
+              />
+            </div>
+            
+            <button 
+              style={styles.cupomButton}
+              onClick={adicionarCupom}
+            >
+              Adicionar Cupom
+            </button>
+          </div>
+          
+          {cupons.length > 0 && (
+            <div style={styles.listaCupons}>
+              {cupons.map((cupom, index) => (
+                <div key={index} style={styles.cupomItem}>
+                  <div style={styles.cupomInfo}>
+                    <strong>{cupom.nome}</strong> - {cupom.desconto}% de desconto
+                  </div>
+                  <button 
+                    style={styles.removerCupomButton}
+                    onClick={() => removerCupom(index)}
+                  >
+                    Remover
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <button style={styles.button} onClick={salvarConfiguracoes}>
+          Salvar Configurações
         </button>
       </div>
 
@@ -114,6 +203,8 @@ export default function Admin() {
                   </div>
                   <p><strong>Chave PIX:</strong> {reserva.chave_pix}</p>
                   <p><strong>Comprovante:</strong> {reserva.comprovante || 'Não enviado'}</p>
+                  <p><strong>Cupom Aplicado:</strong> {reserva.cupom || 'Nenhum'}</p>
+                  <p><strong>Desconto Aplicado:</strong> {reserva.desconto || 0}%</p>
                 </div>
               </div>
             );
@@ -177,6 +268,59 @@ const styles = {
     cursor: 'pointer',
     '&:hover': {
       backgroundColor: '#A0522D'
+    }
+  },
+  cuponsContainer: {
+    marginTop: '20px',
+    padding: '20px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC'
+  },
+  novoCupomContainer: {
+    display: 'flex',
+    gap: '15px',
+    marginBottom: '20px'
+  },
+  cupomButton: {
+    padding: '10px 20px',
+    fontSize: '14px',
+    backgroundColor: '#8B4513',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#A0522D'
+    }
+  },
+  listaCupons: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px'
+  },
+  cupomItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC'
+  },
+  cupomInfo: {
+    color: '#8B4513'
+  },
+  removerCupomButton: {
+    padding: '5px 10px',
+    fontSize: '12px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '3px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#c82333'
     }
   },
   semReservas: {
