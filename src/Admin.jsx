@@ -8,6 +8,7 @@ const Admin = () => {
   const [precoAdulto, setPrecoAdulto] = useState(69.90);
   const [precoCrianca, setPrecoCrianca] = useState(34.95);
   const [chavePix, setChavePix] = useState('');
+  const [tipoChavePix, setTipoChavePix] = useState('cpf');
   const [cupons, setCupons] = useState([]);
   const [novoCupom, setNovoCupom] = useState({ nome: '', desconto: 0 });
 
@@ -35,6 +36,7 @@ const Admin = () => {
       setPrecoAdulto(data.adulto);
       setPrecoCrianca(data.crianca);
       setChavePix(data.chave_pix);
+      setTipoChavePix(data.tipo_chave_pix || 'cpf');
       setCupons(data.cupons || []);
     }
   };
@@ -47,6 +49,7 @@ const Admin = () => {
         adulto: precoAdulto, 
         crianca: precoCrianca,
         chave_pix: chavePix,
+        tipo_chave_pix: tipoChavePix,
         cupons: cupons
       });
 
@@ -77,11 +80,13 @@ const Admin = () => {
         precoAdulto={precoAdulto}
         precoCrianca={precoCrianca}
         chavePix={chavePix}
+        tipoChavePix={tipoChavePix}
         cupons={cupons}
         novoCupom={novoCupom}
         setPrecoAdulto={setPrecoAdulto}
         setPrecoCrianca={setPrecoCrianca}
         setChavePix={setChavePix}
+        setTipoChavePix={setTipoChavePix}
         setNovoCupom={setNovoCupom}
         adicionarCupom={adicionarCupom}
         removerCupom={removerCupom}

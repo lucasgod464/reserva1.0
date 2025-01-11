@@ -16,6 +16,7 @@ const Reserva = () => {
   const [cupom, setCupom] = useState('');
   const [descontoAplicado, setDescontoAplicado] = useState(0);
   const [chavePix, setChavePix] = useState('');
+  const [tipoChavePix, setTipoChavePix] = useState('cpf');
   const [cuponsDisponiveis, setCuponsDisponiveis] = useState([]);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const Reserva = () => {
     if (!error) {
       setPrecos(data);
       setChavePix(data.chave_pix);
+      setTipoChavePix(data.tipo_chave_pix || 'cpf');
       setCuponsDisponiveis(data.cupons || []);
     }
   }
@@ -95,6 +97,7 @@ const Reserva = () => {
           comprovante: comprovante ? comprovante.name : null,
           valor_total: valorTotal,
           chave_pix: chavePix,
+          tipo_chave_pix: tipoChavePix,
           cupom: cupom || null,
           desconto: descontoAplicado
         }])
@@ -147,6 +150,7 @@ const Reserva = () => {
 
       <PagamentoSection
         chavePix={chavePix}
+        tipoChavePix={tipoChavePix}
         valorTotal={valorTotal}
         handleClickPix={handleClickPix}
         mostrarAviso={mostrarAviso}

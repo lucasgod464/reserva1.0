@@ -2,15 +2,25 @@ import React from 'react';
 
 const PagamentoSection = ({
   chavePix,
+  tipoChavePix,
   valorTotal,
   handleClickPix,
   mostrarAviso,
   handleComprovanteChange
 }) => {
+  const tiposChavePix = {
+    cpf: 'CPF',
+    cnpj: 'CNPJ',
+    email: 'E-mail',
+    telefone: 'Telefone',
+    chaveAleatoria: 'Chave Aleatória'
+  };
+
   return (
     <div style={styles.pagamentoContainer}>
       <h3 style={styles.pagamentoTitle}>Pagamento</h3>
       <div style={styles.pixContainer} onClick={handleClickPix}>
+        <strong>Tipo PIX:</strong> {tiposChavePix[tipoChavePix]}<br />
         <strong>Chave PIX:</strong> {chavePix}
       </div>
       {mostrarAviso && (
