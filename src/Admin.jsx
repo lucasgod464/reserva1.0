@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabaseClient';
 import ConfiguracaoForm from './components/ConfiguracaoForm';
 import ReservaCard from './components/ReservaCard';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 const Admin = () => {
   const [reservas, setReservas] = useState([]);
@@ -40,6 +44,58 @@ const Admin = () => {
       setTipoChavePix(data.tipo_chave_pix || 'cpf');
       setCupons(data.cupons || []);
     }
+  };
+
+  const exportarPDF = () => {
+    const reservasAprovadas = reservas.filter(reserva => reserva.aprovada);
+    const doc = new jsPDF();
+
+    const headers = [['Nome', 'Tipo', 'Valor Adulto', 'Valor Criança']];
+    const data = reservasAprovadas.flatMap(reserva => 
+      reserva.nomes.map((nome, index) => [
+        nome,
+        reserva.criancas[index] ? 'Criança' : 'Adulto',
+        reserva.criancas[index] ? '' : `R$ ${precoAdulto.toFixed(2)}`,
+        reserva.criancas[index] ? `R$ ${precoCrianca.toFixed(2)}` : ''
+      ])
+    );
+
+    doc.text('Relatório de Reservas Aprovadas', 14, 15);
+    doc.autoTable({
+      head: headers,
+      body: data,
+      startY: 20,
+      theme: 'grid',
+      styles: {
+        fontSize: 10,
+        cellPadding: 2,
+        valign: 'middle',
+        halign: 'center'
+      },
+      headStyles: {
+        fillColor: [135, 206, 235], // Azul claro
+        textColor: [0, 0, 0]
+      }
+    });
+
+    doc.save('reservas-aprovadas.pdf');
+  };
+
+  const exportarXLS = () => {
+    const reservasAprovadas = reservas.filter(reserva => reserva.aprovada);
+    const data = reservasAprovadas.flatMap(reserva => 
+      reserva.nomes.map((nome, index) => ({
+        Nome: nome,
+        Tipo: reserva.criancas[index] ? 'Criança' : 'Adulto',
+        'Valor Adulto': reserva.criancas[index] ? '' : `R$ ${precoAdulto.toFixed(2)}`,
+        'Valor Criança': reserva.criancas[index] ? `R$ ${precoCrianca.toFixed(2)}` : ''
+      }))
+    );
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reservas');
+    XLSX.writeFile(workbook, 'reservas-aprovadas.xlsx');
   };
 
   const salvarConfiguracoes = async () => {
@@ -143,6 +199,15 @@ const Admin = () => {
         </div>
       ) : (
         <div style={styles.reservasContainer}>
+          <div style={styles.exportButtons}>
+            <button style={styles.exportButton} onClick={exportarPDF}>
+              Exportar PDF
+            </button>
+            <button style={styles.exportButton} onClick={exportarXLS}>
+              Exportar XLS
+            </button>
+          </div>
+
           {reservasAprovadas.length === 0 ? (
             <p style={styles.semReservas}>Nenhuma reserva aprovada.</p>
           ) : (
@@ -173,6 +238,24 @@ const styles = {
     textAlign: 'center',
     color: '#8B4513',
     marginBottom: '20px'
+  },
+  exportButtons: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '10px',
+    marginBottom: '20px'
+  },
+  exportButton: {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#87CEEB', // Azul claro
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#6CA6CD' // Azul claro mais escuro no hover
+    }
   },
   tabsContainer: {
     display: 'flex',
