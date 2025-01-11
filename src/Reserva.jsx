@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient';
 import ReservaForm from './components/ReservaForm';
 import PagamentoSection from './components/PagamentoSection';
 import PixPopup from './components/PixPopup';
+import Notification from './components/Notification';
 
 const Reserva = () => {
   const [pessoas, setPessoas] = useState(1);
@@ -18,6 +19,12 @@ const Reserva = () => {
   const [chavepix, setChavepix] = useState('');
   const [tipo_chavepix, setTipoChavepix] = useState('cpf');
   const [cuponsDisponiveis, setCuponsDisponiveis] = useState([]);
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   useEffect(() => {
     fetchConfiguracoes();
@@ -72,10 +79,10 @@ const Reserva = () => {
     const cupomValido = cuponsDisponiveis.find(c => c.nome === cupom);
     if (cupomValido) {
       setDescontoAplicado(cupomValido.desconto);
-      alert(`Cupom "${cupomValido.nome}" aplicado com sucesso!`);
+      showNotification(`Cupom "${cupomValido.nome}" aplicado com sucesso!`, 'success');
     } else {
       setDescontoAplicado(0);
-      alert('Cupom inválido');
+      showNotification('Cupom inválido', 'error');
     }
   };
 
@@ -89,7 +96,6 @@ const Reserva = () => {
     try {
       let comprovanteNome = null;
 
-      // Se um comprovante foi enviado, faz o upload para o Supabase Storage
       if (comprovante) {
         const extensao = comprovante.name.split('.').pop();
         comprovanteNome = `comprovante_${Date.now()}.${extensao}`;
@@ -102,7 +108,6 @@ const Reserva = () => {
         if (uploadError) throw uploadError;
       }
 
-      // Salva a reserva no banco de dados
       const { data, error } = await supabase
         .from('reservas')
         .insert([{
@@ -121,7 +126,7 @@ const Reserva = () => {
 
       if (error) throw error;
 
-      alert(`Reserva realizada com sucesso! ID: ${data[0].id}`);
+      showNotification(`Reserva realizada com sucesso! ID: ${data[0].id}`, 'success');
       setPessoas(1);
       setNomes(['']);
       setCriancas([false]);
@@ -130,7 +135,7 @@ const Reserva = () => {
       setCupom('');
       setDescontoAplicado(0);
     } catch (error) {
-      alert('Erro ao salvar a reserva: ' + error.message);
+      showNotification('Erro ao salvar a reserva: ' + error.message, 'error');
     }
   };
 
@@ -147,6 +152,7 @@ const Reserva = () => {
 
   return (
     <div style={styles.container}>
+      {notification && <Notification message={notification.message} type={notification.type} />}
       <h1 style={styles.title}>Fazer Reserva</h1>
       
       <ReservaForm

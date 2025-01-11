@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import Notification from './components/Notification';
 
 const Admin = () => {
   const [reservas, setReservas] = useState([]);
@@ -16,6 +17,12 @@ const Admin = () => {
   const [cupons, setCupons] = useState([]);
   const [novoCupom, setNovoCupom] = useState({ nome: '', desconto: 0 });
   const [abaAtiva, setAbaAtiva] = useState('pendentes');
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   useEffect(() => {
     fetchReservas();
@@ -73,8 +80,8 @@ const Admin = () => {
         halign: 'center'
       },
       headStyles: {
-        fillColor: [139, 69, 19], // Terracota
-        textColor: [255, 255, 255] // Texto branco
+        fillColor: [139, 69, 19],
+        textColor: [255, 255, 255]
       }
     });
 
@@ -111,9 +118,9 @@ const Admin = () => {
       });
 
     if (!error) {
-      alert('Configurações atualizadas com sucesso!');
+      showNotification('Configurações atualizadas com sucesso!', 'success');
     } else {
-      alert('Erro ao atualizar configurações: ' + error.message);
+      showNotification('Erro ao atualizar configurações: ' + error.message, 'error');
     }
   };
 
@@ -137,9 +144,9 @@ const Admin = () => {
 
     if (!error) {
       fetchReservas();
-      alert('Reserva aprovada com sucesso!');
+      showNotification('Reserva aprovada com sucesso!', 'success');
     } else {
-      alert('Erro ao aprovar reserva: ' + error.message);
+      showNotification('Erro ao aprovar reserva: ' + error.message, 'error');
     }
   };
 
@@ -148,6 +155,7 @@ const Admin = () => {
 
   return (
     <div style={styles.container}>
+      {notification && <Notification message={notification.message} type={notification.type} />}
       <h1 style={styles.title}>Painel de Administração</h1>
 
       <ConfiguracaoForm
@@ -248,13 +256,13 @@ const styles = {
   exportButton: {
     padding: '10px 20px',
     fontSize: '16px',
-    backgroundColor: '#87CEEB', // Azul claro
+    backgroundColor: '#87CEEB',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
     '&:hover': {
-      backgroundColor: '#6CA6CD' // Azul claro mais escuro no hover
+      backgroundColor: '#6CA6CD'
     }
   },
   tabsContainer: {
