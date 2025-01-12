@@ -51,6 +51,9 @@ const ReservaCard = ({ reserva, index, onAprovar }) => {
           <div style={styles.totalBox}>
             <strong>Crianças:</strong> {totalCriancas}
           </div>
+          <div style={styles.totalBox}>
+            <strong>Total:</strong> R$ {reserva.valor_total}
+          </div>
         </div>
 
         <div style={styles.nomesContainer}>

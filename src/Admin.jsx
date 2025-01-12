@@ -18,6 +18,8 @@ const Admin = () => {
   const [novoCupom, setNovoCupom] = useState({ nome: '', desconto: 0 });
   const [abaAtiva, setAbaAtiva] = useState('pendentes');
   const [notification, setNotification] = useState(null);
+  const [filtroCupom, setFiltroCupom] = useState('');
+  const [termoBusca, setTermoBusca] = useState('');
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -54,11 +56,11 @@ const Admin = () => {
   };
 
   const exportarPDF = () => {
-    const reservasAprovadas = reservas.filter(reserva => reserva.aprovada);
+    const reservasFiltradas = filtrarReservas(reservasAprovadas);
     const doc = new jsPDF();
 
     const headers = [['Nome', 'Tipo', 'Valor Adulto', 'Valor Criança']];
-    const data = reservasAprovadas.flatMap(reserva => 
+    const data = reservasFiltradas.flatMap(reserva => 
       reserva.nomes.map((nome, index) => [
         nome,
         reserva.criancas[index] ? 'Criança' : 'Adulto',
@@ -89,8 +91,8 @@ const Admin = () => {
   };
 
   const exportarXLS = () => {
-    const reservasAprovadas = reservas.filter(reserva => reserva.aprovada);
-    const data = reservasAprovadas.flatMap(reserva => 
+    const reservasFiltradas = filtrarReservas(reservasAprovadas);
+    const data = reservasFiltradas.flatMap(reserva => 
       reserva.nomes.map((nome, index) => ({
         Nome: nome,
         Tipo: reserva.criancas[index] ? 'Criança' : 'Adulto',
@@ -103,6 +105,25 @@ const Admin = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Reservas');
     XLSX.writeFile(workbook, 'reservas-aprovadas.xlsx');
+  };
+
+  const filtrarReservas = (reservas) => {
+    let reservasFiltradas = reservas;
+
+    if (termoBusca) {
+      const busca = termoBusca.toLowerCase();
+      reservasFiltradas = reservasFiltradas.filter(reserva =>
+        reserva.nomes.some(nome => nome.toLowerCase().includes(busca)) ||
+        reserva.telefone.includes(busca) ||
+        reserva.id.toString().includes(busca)
+      );
+    }
+
+    if (filtroCupom) {
+      reservasFiltradas = reservasFiltradas.filter(reserva => reserva.cupom === filtroCupom);
+    }
+
+    return reservasFiltradas;
   };
 
   const salvarConfiguracoes = async () => {
@@ -150,8 +171,8 @@ const Admin = () => {
     }
   };
 
-  const reservasPendentes = reservas.filter((reserva) => !reserva.aprovada);
-  const reservasAprovadas = reservas.filter((reserva) => reserva.aprovada);
+  const reservasPendentes = filtrarReservas(reservas.filter((reserva) => !reserva.aprovada));
+  const reservasAprovadas = filtrarReservas(reservas.filter((reserva) => reserva.aprovada));
 
   return (
     <div style={styles.container}>
@@ -192,6 +213,28 @@ const Admin = () => {
 
       {abaAtiva === 'pendentes' ? (
         <div style={styles.reservasContainer}>
+          <div style={styles.filtroContainer}>
+            <input
+              type="text"
+              placeholder="Buscar por nome, telefone ou ID"
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+              style={styles.buscaInput}
+            />
+            <select
+              style={styles.filtroSelect}
+              value={filtroCupom}
+              onChange={(e) => setFiltroCupom(e.target.value)}
+            >
+              <option value="">Todos os Cupons</option>
+              {cupons.map((cupom, index) => (
+                <option key={index} value={cupom.nome}>
+                  {cupom.nome} ({cupom.desconto}%)
+                </option>
+              ))}
+            </select>
+          </div>
+
           {reservasPendentes.length === 0 ? (
             <p style={styles.semReservas}>Nenhuma reserva pendente.</p>
           ) : (
@@ -207,7 +250,26 @@ const Admin = () => {
         </div>
       ) : (
         <div style={styles.reservasContainer}>
-          <div style={styles.exportButtons}>
+          <div style={styles.filtroContainer}>
+            <input
+              type="text"
+              placeholder="Buscar por nome, telefone ou ID"
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+              style={styles.buscaInput}
+            />
+            <select
+              style={styles.filtroSelect}
+              value={filtroCupom}
+              onChange={(e) => setFiltroCupom(e.target.value)}
+            >
+              <option value="">Todos os Cupons</option>
+              {cupons.map((cupom, index) => (
+                <option key={index} value={cupom.nome}>
+                  {cupom.nome} ({cupom.desconto}%)
+                </option>
+              ))}
+            </select>
             <button style={styles.exportButton} onClick={exportarPDF}>
               Exportar PDF
             </button>
@@ -247,15 +309,33 @@ const styles = {
     color: '#8B4513',
     marginBottom: '20px'
   },
-  exportButtons: {
+  filtroContainer: {
     display: 'flex',
-    justifyContent: 'center',
     gap: '10px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    alignItems: 'center'
+  },
+  buscaInput: {
+    padding: '8px 12px',
+    fontSize: '14px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC',
+    color: '#8B4513',
+    flex: 2
+  },
+  filtroSelect: {
+    padding: '8px 12px',
+    fontSize: '14px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC',
+    color: '#8B4513',
+    flex: 1
   },
   exportButton: {
-    padding: '10px 20px',
-    fontSize: '16px',
+    padding: '8px 12px',
+    fontSize: '14px',
     backgroundColor: '#87CEEB',
     color: 'white',
     border: 'none',
