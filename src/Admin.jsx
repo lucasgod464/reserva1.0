@@ -20,6 +20,8 @@ const Admin = () => {
   const [notification, setNotification] = useState(null);
   const [filtroCupom, setFiltroCupom] = useState('');
   const [termoBusca, setTermoBusca] = useState('');
+  const [tituloPopup, setTituloPopup] = useState('Bem-vindo ao Rodízio!');
+  const [descricaoPopup, setDescricaoPopup] = useState('Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -52,6 +54,8 @@ const Admin = () => {
       setChavePix(data.chave_pix);
       setTipoChavePix(data.tipo_chave_pix || 'cpf');
       setCupons(data.cupons || []);
+      setTituloPopup(data.titulo_popup || 'Bem-vindo ao Rodízio!');
+      setDescricaoPopup(data.descricao_popup || 'Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
     }
   };
 
@@ -135,7 +139,9 @@ const Admin = () => {
         crianca: precoCrianca,
         chave_pix: chavePix,
         tipo_chave_pix: tipoChavePix,
-        cupons: cupons
+        cupons: cupons,
+        titulo_popup: tituloPopup,
+        descricao_popup: descricaoPopup
       });
 
     if (!error) {
@@ -186,13 +192,15 @@ const Admin = () => {
         tipoChavePix={tipoChavePix}
         cupons={cupons}
         novoCupom={novoCupom}
+        tituloPopup={tituloPopup}
+        descricaoPopup={descricaoPopup}
         setPrecoAdulto={setPrecoAdulto}
         setPrecoCrianca={setPrecoCrianca}
         setChavePix={setChavePix}
         setTipoChavePix={setTipoChavePix}
         setNovoCupom={setNovoCupom}
-        adicionarCupom={adicionarCupom}
-        removerCupom={removerCupom}
+        setTituloPopup={setTituloPopup}
+        setDescricaoPopup={setDescricaoPopup}
         salvarConfiguracoes={salvarConfiguracoes}
       />
 

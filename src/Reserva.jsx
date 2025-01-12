@@ -4,6 +4,7 @@ import ReservaForm from './components/ReservaForm';
 import PagamentoSection from './components/PagamentoSection';
 import PixPopup from './components/PixPopup';
 import Notification from './components/Notification';
+import WelcomePopup from './components/WelcomePopup';
 
 const Reserva = () => {
   const [pessoas, setPessoas] = useState(1);
@@ -20,6 +21,7 @@ const Reserva = () => {
   const [tipo_chavepix, setTipoChavepix] = useState('cpf');
   const [cuponsDisponiveis, setCuponsDisponiveis] = useState([]);
   const [notification, setNotification] = useState(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -153,6 +155,8 @@ const Reserva = () => {
   return (
     <div style={styles.container}>
       {notification && <Notification message={notification.message} type={notification.type} />}
+      {showWelcomePopup && <WelcomePopup onClose={() => setShowWelcomePopup(false)} />}
+      
       <h1 style={styles.title}>Fazer Reserva</h1>
       
       <ReservaForm

@@ -7,13 +7,15 @@ const ConfiguracaoForm = ({
   tipoChavePix,
   cupons,
   novoCupom,
+  tituloPopup,
+  descricaoPopup,
   setPrecoAdulto,
   setPrecoCrianca,
   setChavePix,
   setTipoChavePix,
   setNovoCupom,
-  adicionarCupom,
-  removerCupom,
+  setTituloPopup,
+  setDescricaoPopup,
   salvarConfiguracoes
 }) => {
   const handleNomeCupomChange = (e) => {
@@ -25,6 +27,18 @@ const ConfiguracaoForm = ({
   };
 
   const isCupomValido = novoCupom.nome && novoCupom.desconto > 0;
+
+  const adicionarCupom = () => {
+    if (novoCupom.nome && novoCupom.desconto > 0) {
+      setCupons([...cupons, novoCupom]);
+      setNovoCupom({ nome: '', desconto: 0 });
+    }
+  };
+
+  const removerCupom = (index) => {
+    const novosCupons = cupons.filter((_, i) => i !== index);
+    setCupons(novosCupons);
+  };
 
   return (
     <div style={styles.configuracaoContainer}>
@@ -72,6 +86,24 @@ const ConfiguracaoForm = ({
             onChange={(e) => setChavePix(e.target.value)}
           />
         </div>
+      </div>
+
+      {/* Seção de Popup */}
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>Mensagem de Boas-Vindas</h3>
+        <InputField
+          label="Título do Popup:"
+          type="text"
+          value={tituloPopup}
+          onChange={(e) => setTituloPopup(e.target.value)}
+        />
+        <InputField
+          label="Descrição do Popup:"
+          type="text"
+          value={descricaoPopup}
+          onChange={(e) => setDescricaoPopup(e.target.value)}
+          textarea
+        />
       </div>
 
       {/* Seção de Cupons */}
@@ -134,20 +166,29 @@ const ConfiguracaoForm = ({
 };
 
 // Componente reutilizável para campos de entrada
-const InputField = ({ label, type, value, onChange, placeholder, step, min, max, withPercentSymbol }) => (
+const InputField = ({ label, type, value, onChange, placeholder, step, min, max, withPercentSymbol, textarea }) => (
   <div style={styles.inputGroup}>
     <label style={styles.label}>{label}</label>
     <div style={styles.inputContainer}>
-      <input
-        style={styles.input}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        step={step}
-        min={min}
-        max={max}
-      />
+      {textarea ? (
+        <textarea
+          style={{ ...styles.input, height: '100px' }}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+        />
+      ) : (
+        <input
+          style={styles.input}
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          step={step}
+          min={min}
+          max={max}
+        />
+      )}
       {withPercentSymbol && <span style={styles.percentSymbol}>%</span>}
     </div>
   </div>
