@@ -202,7 +202,7 @@ const Reserva = () => {
 const styles = {
   container: {
     maxWidth: '600px',
-    margin: '0 auto',
+    margin: '40px auto', // Aumentei a margem superior para 40px
     padding: '20px',
     backgroundColor: '#F5F5DC',
     borderRadius: '10px',
@@ -218,7 +218,7 @@ const styles = {
     textAlign: 'right',
     fontSize: '18px',
     color: '#8B4513',
-    margin: '10px 0',
+    margin: '20px 0', // Aumentei a margem vertical
     paddingRight: '10px'
   },
   button: {
@@ -229,6 +229,8 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    width: '100%',
+    marginTop: '20px', // Adicionei margem superior
     '&:hover': {
       backgroundColor: '#A0522D'
     }
