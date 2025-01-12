@@ -22,6 +22,7 @@ const Admin = () => {
   const [termoBusca, setTermoBusca] = useState('');
   const [tituloPopup, setTituloPopup] = useState('Bem-vindo ao Rodízio!');
   const [descricaoPopup, setDescricaoPopup] = useState('Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
+  const [popupAtivo, setPopupAtivo] = useState(true);
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -56,6 +57,7 @@ const Admin = () => {
       setCupons(data.cupons || []);
       setTituloPopup(data.titulo_popup || 'Bem-vindo ao Rodízio!');
       setDescricaoPopup(data.descricao_popup || 'Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
+      setPopupAtivo(data.popup_ativo !== undefined ? data.popup_ativo : true);
     }
   };
 
@@ -141,7 +143,8 @@ const Admin = () => {
         tipo_chave_pix: tipoChavePix,
         cupons: cupons,
         titulo_popup: tituloPopup,
-        descricao_popup: descricaoPopup
+        descricao_popup: descricaoPopup,
+        popup_ativo: popupAtivo
       });
 
     if (!error) {
@@ -149,18 +152,6 @@ const Admin = () => {
     } else {
       showNotification('Erro ao atualizar configurações: ' + error.message, 'error');
     }
-  };
-
-  const adicionarCupom = () => {
-    if (novoCupom.nome && novoCupom.desconto > 0) {
-      setCupons([...cupons, novoCupom]);
-      setNovoCupom({ nome: '', desconto: 0 });
-    }
-  };
-
-  const removerCupom = (index) => {
-    const novosCupons = cupons.filter((_, i) => i !== index);
-    setCupons(novosCupons);
   };
 
   const aprovarReserva = async (id) => {
@@ -194,6 +185,7 @@ const Admin = () => {
         novoCupom={novoCupom}
         tituloPopup={tituloPopup}
         descricaoPopup={descricaoPopup}
+        popupAtivo={popupAtivo}
         setPrecoAdulto={setPrecoAdulto}
         setPrecoCrianca={setPrecoCrianca}
         setChavePix={setChavePix}
@@ -201,6 +193,7 @@ const Admin = () => {
         setNovoCupom={setNovoCupom}
         setTituloPopup={setTituloPopup}
         setDescricaoPopup={setDescricaoPopup}
+        setPopupAtivo={setPopupAtivo}
         salvarConfiguracoes={salvarConfiguracoes}
       />
 

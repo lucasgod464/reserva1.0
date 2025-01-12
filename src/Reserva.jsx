@@ -21,7 +21,10 @@ const Reserva = () => {
   const [tipo_chavepix, setTipoChavepix] = useState('cpf');
   const [cuponsDisponiveis, setCuponsDisponiveis] = useState([]);
   const [notification, setNotification] = useState(null);
-  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [popupAtivo, setPopupAtivo] = useState(true);
+  const [tituloPopup, setTituloPopup] = useState('');
+  const [descricaoPopup, setDescricaoPopup] = useState('');
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -39,10 +42,14 @@ const Reserva = () => {
       .single();
 
     if (!error) {
-      setPrecos(data);
+      setPrecos({ adulto: data.adulto, crianca: data.crianca });
       setChavepix(data.chave_pix);
       setTipoChavepix(data.tipo_chave_pix || 'cpf');
       setCuponsDisponiveis(data.cupons || []);
+      setTituloPopup(data.titulo_popup || 'Bem-vindo ao Rodízio!');
+      setDescricaoPopup(data.descricao_popup || 'Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
+      setPopupAtivo(data.popup_ativo);
+      setShowWelcomePopup(data.popup_ativo);
     }
   }
 
@@ -155,7 +162,13 @@ const Reserva = () => {
   return (
     <div style={styles.container}>
       {notification && <Notification message={notification.message} type={notification.type} />}
-      {showWelcomePopup && <WelcomePopup onClose={() => setShowWelcomePopup(false)} />}
+      {showWelcomePopup && popupAtivo && (
+        <WelcomePopup 
+          onClose={() => setShowWelcomePopup(false)}
+          titulo={tituloPopup}
+          descricao={descricaoPopup}
+        />
+      )}
       
       <h1 style={styles.title}>Fazer Reserva</h1>
       
@@ -202,7 +215,7 @@ const Reserva = () => {
 const styles = {
   container: {
     maxWidth: '600px',
-    margin: '40px auto', // Aumentei a margem superior para 40px
+    margin: '40px auto',
     padding: '20px',
     backgroundColor: '#F5F5DC',
     borderRadius: '10px',
@@ -218,7 +231,7 @@ const styles = {
     textAlign: 'right',
     fontSize: '18px',
     color: '#8B4513',
-    margin: '20px 0', // Aumentei a margem vertical
+    margin: '20px 0',
     paddingRight: '10px'
   },
   button: {
@@ -230,7 +243,7 @@ const styles = {
     borderRadius: '5px',
     cursor: 'pointer',
     width: '100%',
-    marginTop: '20px', // Adicionei margem superior
+    marginTop: '20px',
     '&:hover': {
       backgroundColor: '#A0522D'
     }

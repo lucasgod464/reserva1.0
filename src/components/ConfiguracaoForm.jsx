@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ConfiguracaoForm = ({
   precoAdulto,
@@ -9,6 +9,7 @@ const ConfiguracaoForm = ({
   novoCupom,
   tituloPopup,
   descricaoPopup,
+  popupAtivo,
   setPrecoAdulto,
   setPrecoCrianca,
   setChavePix,
@@ -16,8 +17,11 @@ const ConfiguracaoForm = ({
   setNovoCupom,
   setTituloPopup,
   setDescricaoPopup,
+  setPopupAtivo,
   salvarConfiguracoes
 }) => {
+  const [minimizado, setMinimizado] = useState(true);
+
   const handleNomeCupomChange = (e) => {
     setNovoCupom({ ...novoCupom, nome: e.target.value });
   };
@@ -40,136 +44,160 @@ const ConfiguracaoForm = ({
     setCupons(novosCupons);
   };
 
+  const toggleMinimizado = () => {
+    setMinimizado(!minimizado);
+  };
+
   return (
     <div style={styles.configuracaoContainer}>
-      <h2 style={styles.subtitle}>Configurações</h2>
-      
-      <div style={styles.gridContainer}>
-        {/* Seção de Preços */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Preços</h3>
-          <InputField
-            label="Preço para Adulto:"
-            type="number"
-            step="0.01"
-            value={precoAdulto}
-            onChange={(e) => setPrecoAdulto(parseFloat(e.target.value))}
-          />
-          <InputField
-            label="Preço para Criança:"
-            type="number"
-            step="0.01"
-            value={precoCrianca}
-            onChange={(e) => setPrecoCrianca(parseFloat(e.target.value))}
-          />
-        </div>
-
-        {/* Seção de PIX */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Configurações PIX</h3>
-          <SelectField
-            label="Tipo de Chave PIX:"
-            value={tipoChavePix}
-            onChange={(e) => setTipoChavePix(e.target.value)}
-            options={[
-              { value: 'cpf', label: 'CPF' },
-              { value: 'cnpj', label: 'CNPJ' },
-              { value: 'email', label: 'E-mail' },
-              { value: 'telefone', label: 'Telefone' },
-              { value: 'chaveAleatoria', label: 'Chave Aleatória' }
-            ]}
-          />
-          <InputField
-            label="Chave PIX:"
-            type="text"
-            value={chavePix}
-            onChange={(e) => setChavePix(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Seção de Popup */}
-      <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>Mensagem de Boas-Vindas</h3>
-        <InputField
-          label="Título do Popup:"
-          type="text"
-          value={tituloPopup}
-          onChange={(e) => setTituloPopup(e.target.value)}
-        />
-        <InputField
-          label="Descrição do Popup:"
-          type="text"
-          value={descricaoPopup}
-          onChange={(e) => setDescricaoPopup(e.target.value)}
-          textarea
-        />
-      </div>
-
-      {/* Seção de Cupons */}
-      <div style={styles.cuponsContainer}>
-        <h3 style={styles.sectionTitle}>Cupons de Desconto</h3>
-        
-        <div style={styles.novoCupomContainer}>
-          <div style={styles.cupomInputGroup}>
-            <InputField
-              label="Nome do Cupom:"
-              type="text"
-              placeholder="Ex: DESCONTO10"
-              value={novoCupom.nome}
-              onChange={handleNomeCupomChange}
-            />
-            <InputField
-              label="Desconto (%):"
-              type="number"
-              min="0"
-              max="100"
-              placeholder="0 a 100"
-              value={novoCupom.desconto}
-              onChange={handleDescontoCupomChange}
-              withPercentSymbol
-            />
-          </div>
-          
-          <button 
-            style={styles.cupomButton}
-            onClick={adicionarCupom}
-            disabled={!isCupomValido}
-          >
-            Adicionar Cupom
-          </button>
-        </div>
-        
-        {cupons.length > 0 ? (
-          <div style={styles.listaCupons}>
-            {cupons.map((cupom, index) => (
-              <CupomItem
-                key={index}
-                nome={cupom.nome}
-                desconto={cupom.desconto}
-                onRemover={() => removerCupom(index)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div style={styles.semCupons}>
-            Nenhum cupom cadastrado. Adicione um novo cupom acima.
-          </div>
-        )}
-      </div>
-
-      {/* Botão de Salvar Configurações */}
-      <div style={styles.saveButtonContainer}>
-        <button style={styles.button} onClick={salvarConfiguracoes}>
-          Salvar Configurações
+      <div style={styles.headerContainer}>
+        <h2 style={styles.subtitle}>Configurações</h2>
+        <button onClick={toggleMinimizado} style={styles.minimizeButton}>
+          {minimizado ? 'Expandir' : 'Minimizar'}
         </button>
       </div>
+      
+      {!minimizado && (
+        <>
+          <div style={styles.gridContainer}>
+            {/* Seção de Preços */}
+            <div style={styles.section}>
+              <h3 style={styles.sectionTitle}>Preços</h3>
+              <InputField
+                label="Preço para Adulto:"
+                type="number"
+                step="0.01"
+                value={precoAdulto}
+                onChange={(e) => setPrecoAdulto(parseFloat(e.target.value))}
+              />
+              <InputField
+                label="Preço para Criança:"
+                type="number"
+                step="0.01"
+                value={precoCrianca}
+                onChange={(e) => setPrecoCrianca(parseFloat(e.target.value))}
+              />
+            </div>
+
+            {/* Seção de PIX */}
+            <div style={styles.section}>
+              <h3 style={styles.sectionTitle}>Configurações PIX</h3>
+              <SelectField
+                label="Tipo de Chave PIX:"
+                value={tipoChavePix}
+                onChange={(e) => setTipoChavePix(e.target.value)}
+                options={[
+                  { value: 'cpf', label: 'CPF' },
+                  { value: 'cnpj', label: 'CNPJ' },
+                  { value: 'email', label: 'E-mail' },
+                  { value: 'telefone', label: 'Telefone' },
+                  { value: 'chaveAleatoria', label: 'Chave Aleatória' }
+                ]}
+              />
+              <InputField
+                label="Chave PIX:"
+                type="text"
+                value={chavePix}
+                onChange={(e) => setChavePix(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Seção de Popup */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Mensagem de Boas-Vindas</h3>
+            <div style={styles.popupToggleContainer}>
+              <label style={styles.label}>Ativar Popup:</label>
+              <input
+                type="checkbox"
+                checked={popupAtivo}
+                onChange={(e) => setPopupAtivo(e.target.checked)}
+                style={styles.checkbox}
+              />
+            </div>
+            <InputField
+              label="Título do Popup:"
+              type="text"
+              value={tituloPopup}
+              onChange={(e) => setTituloPopup(e.target.value)}
+              disabled={!popupAtivo}
+            />
+            <InputField
+              label="Descrição do Popup:"
+              type="text"
+              value={descricaoPopup}
+              onChange={(e) => setDescricaoPopup(e.target.value)}
+              textarea
+              disabled={!popupAtivo}
+            />
+          </div>
+
+          {/* Seção de Cupons */}
+          <div style={styles.cuponsContainer}>
+            <h3 style={styles.sectionTitle}>Cupons de Desconto</h3>
+            
+            <div style={styles.novoCupomContainer}>
+              <div style={styles.cupomInputGroup}>
+                <InputField
+                  label="Nome do Cupom:"
+                  type="text"
+                  placeholder="Ex: DESCONTO10"
+                  value={novoCupom.nome}
+                  onChange={handleNomeCupomChange}
+                />
+                <InputField
+                  label="Desconto (%):"
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="0 a 100"
+                  value={novoCupom.desconto}
+                  onChange={handleDescontoCupomChange}
+                  withPercentSymbol
+                />
+              </div>
+              
+              <button 
+                style={styles.cupomButton}
+                onClick={adicionarCupom}
+                disabled={!isCupomValido}
+              >
+                Adicionar Cupom
+              </button>
+            </div>
+            
+            {cupons.length > 0 ? (
+              <div style={styles.listaCupons}>
+                {cupons.map((cupom, index) => (
+                  <CupomItem
+                    key={index}
+                    nome={cupom.nome}
+                    desconto={cupom.desconto}
+                    onRemover={() => removerCupom(index)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div style={styles.semCupons}>
+                Nenhum cupom cadastrado. Adicione um novo cupom acima.
+              </div>
+            )}
+          </div>
+
+          {/* Botão de Salvar Configurações */}
+          <div style={styles.saveButtonContainer}>
+            <button style={styles.button} onClick={salvarConfiguracoes}>
+              Salvar Configurações
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 // Componente reutilizável para campos de entrada
-const InputField = ({ label, type, value, onChange, placeholder, step, min, max, withPercentSymbol, textarea }) => (
+const InputField = ({ label, type, value, onChange, placeholder, step, min, max, withPercentSymbol, textarea, disabled }) => (
   <div style={styles.inputGroup}>
     <label style={styles.label}>{label}</label>
     <div style={styles.inputContainer}>
@@ -179,6 +207,7 @@ const InputField = ({ label, type, value, onChange, placeholder, step, min, max,
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          disabled={disabled}
         />
       ) : (
         <input
@@ -190,6 +219,7 @@ const InputField = ({ label, type, value, onChange, placeholder, step, min, max,
           step={step}
           min={min}
           max={max}
+          disabled={disabled}
         />
       )}
       {withPercentSymbol && <span style={styles.percentSymbol}>%</span>}
@@ -239,10 +269,24 @@ const styles = {
     border: '2px solid #8B4513',
     borderRadius: '10px'
   },
+  headerContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px'
+  },
   subtitle: {
-    textAlign: 'center',
     color: '#8B4513',
-    marginBottom: '30px'
+    margin: 0
+  },
+  minimizeButton: {
+    padding: '5px 10px',
+    fontSize: '14px',
+    backgroundColor: '#8B4513',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer'
   },
   gridContainer: {
     display: 'grid',
@@ -293,7 +337,7 @@ const styles = {
     pointerEvents: 'none'
   },
   saveButtonContainer: {
-    marginTop: '30px', // Adicionado espaçamento acima do botão
+    marginTop: '30px',
     textAlign: 'center'
   },
   button: {
@@ -386,6 +430,17 @@ const styles = {
     color: '#8B4513',
     fontStyle: 'italic',
     padding: '10px'
+  },
+  popupToggleContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '15px'
+  },
+  checkbox: {
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer'
   }
 };
 

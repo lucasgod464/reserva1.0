@@ -1,13 +1,11 @@
 import React from 'react';
 
-const WelcomePopup = ({ onClose }) => {
+const WelcomePopup = ({ onClose, titulo, descricao }) => {
   return (
     <div style={styles.overlay}>
       <div style={styles.popup}>
-        <h2 style={styles.title}>Bem-vindo ao Rodízio!</h2>
-        <p style={styles.description}>
-          Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.
-        </p>
+        <h2 style={styles.title}>{titulo}</h2>
+        <p style={styles.description}>{descricao}</p>
         <button 
           style={styles.button}
           onClick={onClose}
