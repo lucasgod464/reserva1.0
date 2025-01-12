@@ -157,10 +157,13 @@ const ConfiguracaoForm = ({
           </div>
         )}
       </div>
-      
-      <button style={styles.button} onClick={salvarConfiguracoes}>
-        Salvar Configurações
-      </button>
+
+      {/* Botão de Salvar Configurações */}
+      <div style={styles.saveButtonContainer}>
+        <button style={styles.button} onClick={salvarConfiguracoes}>
+          Salvar Configurações
+        </button>
+      </div>
     </div>
   );
 };
@@ -288,6 +291,10 @@ const styles = {
     transform: 'translateY(-50%)',
     color: '#8B4513',
     pointerEvents: 'none'
+  },
+  saveButtonContainer: {
+    marginTop: '30px', // Adicionado espaçamento acima do botão
+    textAlign: 'center'
   },
   button: {
     padding: '10px 20px',
