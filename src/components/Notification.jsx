@@ -16,13 +16,17 @@ const Notification = ({ message, type, duration = 3000 }) => {
   const notificationStyle = {
     position: 'fixed',
     top: '20px',
-    right: '20px',
-    padding: '15px 25px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    padding: '10px 20px',
     borderRadius: '5px',
     color: '#fff',
     zIndex: 1000,
-    animation: 'slideIn 0.3s ease-out',
-    backgroundColor: type === 'success' ? '#28a745' : '#dc3545'
+    animation: 'fadeIn 0.3s ease-out',
+    backgroundColor: type === 'success' ? '#28a745' : '#dc3545',
+    textAlign: 'center',
+    maxWidth: '90%',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
   };
 
   return (

@@ -88,7 +88,7 @@ const Reserva = () => {
     const cupomValido = cuponsDisponiveis.find(c => c.nome === cupom);
     if (cupomValido) {
       setDescontoAplicado(cupomValido.desconto);
-      showNotification(`Cupom "${cupomValido.nome}" aplicado com sucesso!`, 'success');
+      showNotification('Cupom aplicado com sucesso!', 'success');
     } else {
       setDescontoAplicado(0);
       showNotification('Cupom inválido', 'error');
@@ -102,6 +102,24 @@ const Reserva = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validação dos campos
+    const nomesPreenchidos = nomes.every(nome => nome.trim() !== '');
+    if (!nomesPreenchidos) {
+      showNotification('Preencha todos os nomes', 'error');
+      return;
+    }
+
+    if (!telefone.trim()) {
+      showNotification('Informe um número de telefone', 'error');
+      return;
+    }
+
+    if (!comprovante) {
+      showNotification('Envie o comprovante de pagamento', 'error');
+      return;
+    }
+
     try {
       let comprovanteNome = null;
 
@@ -135,7 +153,7 @@ const Reserva = () => {
 
       if (error) throw error;
 
-      showNotification(`Reserva realizada com sucesso! ID: ${data[0].id}`, 'success');
+      showNotification('Reserva realizada com sucesso!', 'success');
       setPessoas(1);
       setNomes(['']);
       setCriancas([false]);
@@ -144,7 +162,7 @@ const Reserva = () => {
       setCupom('');
       setDescontoAplicado(0);
     } catch (error) {
-      showNotification('Erro ao salvar a reserva: ' + error.message, 'error');
+      showNotification('Erro ao salvar a reserva', 'error');
     }
   };
 
@@ -196,11 +214,7 @@ const Reserva = () => {
         handleComprovanteChange={handleComprovanteChange}
       />
 
-      <div style={styles.totalContainer}>
-        <strong>Valor Total:</strong> R$ {valorTotal}
-      </div>
-
-      <button type="submit" style={styles.button} onClick={handleSubmit}>Reservar</button>
+      <button type="submit" style={styles.button} onClick={handleSubmit}>Finalizar Reserva</button>
 
       {mostrarPopupPix && (
         <PixPopup
@@ -226,13 +240,6 @@ const styles = {
     color: '#8B4513',
     marginBottom: '20px',
     paddingLeft: '10px'
-  },
-  totalContainer: {
-    textAlign: 'right',
-    fontSize: '18px',
-    color: '#8B4513',
-    margin: '20px 0',
-    paddingRight: '10px'
   },
   button: {
     padding: '15px',

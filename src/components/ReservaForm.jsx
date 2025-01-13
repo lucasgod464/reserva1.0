@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ReservaForm = ({ 
   pessoas, 
@@ -14,6 +14,8 @@ const ReservaForm = ({
   handleCupomChange,
   aplicarCupom
 }) => {
+  const [mostrarCupom, setMostrarCupom] = useState(false);
+
   return (
     <form style={styles.form}>
       <div style={styles.inputGroup}>
@@ -67,8 +69,15 @@ const ReservaForm = ({
       </div>
 
       <div style={styles.cupomContainer}>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Cupom de Desconto:</label>
+        {!mostrarCupom ? (
+          <button 
+            type="button" 
+            style={styles.mostrarCupomButton}
+            onClick={() => setMostrarCupom(true)}
+          >
+            Tem um cupom de desconto?
+          </button>
+        ) : (
           <div style={styles.cupomInputGroup}>
             <input
               style={styles.cupomInput}
@@ -85,7 +94,7 @@ const ReservaForm = ({
               Aplicar
             </button>
           </div>
-        </div>
+        )}
       </div>
     </form>
   );
@@ -133,10 +142,20 @@ const styles = {
   },
   cupomContainer: {
     marginTop: '10px',
-    padding: '15px',
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  mostrarCupomButton: {
+    padding: '8px 15px',
+    fontSize: '14px',
+    color: '#8B4513',
+    backgroundColor: 'transparent',
     border: '1px solid #8B4513',
     borderRadius: '5px',
-    backgroundColor: '#FFF8DC'
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#FFF8DC'
+    }
   },
   cupomInputGroup: {
     display: 'flex',
@@ -144,15 +163,15 @@ const styles = {
   },
   cupomInput: {
     flex: 1,
-    padding: '12px',
-    fontSize: '16px',
+    padding: '8px',
+    fontSize: '14px',
     border: '1px solid #8B4513',
     borderRadius: '5px',
     backgroundColor: '#FFF8DC'
   },
   cupomButton: {
-    padding: '12px 20px',
-    fontSize: '16px',
+    padding: '8px 15px',
+    fontSize: '14px',
     backgroundColor: '#8B4513',
     color: 'white',
     border: 'none',
