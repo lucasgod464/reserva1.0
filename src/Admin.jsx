@@ -212,30 +212,35 @@ const Admin = () => {
         </button>
       </div>
 
+      <div style={styles.filtroContainer}>
+        <div style={styles.searchContainer}>
+          <input
+            type="text"
+            placeholder="Buscar por nome, telefone ou ID"
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+            style={styles.buscaInput}
+          />
+          <button style={styles.searchButton} onClick={() => setTermoBusca('')}>
+            {termoBusca ? '✕' : '🔍'}
+          </button>
+        </div>
+        <select
+          style={styles.filtroSelect}
+          value={filtroCupom}
+          onChange={(e) => setFiltroCupom(e.target.value)}
+        >
+          <option value="">Todos os Cupons</option>
+          {cupons.map((cupom, index) => (
+            <option key={index} value={cupom.nome}>
+              {cupom.nome} ({cupom.desconto}%)
+            </option>
+          ))}
+        </select>
+      </div>
+
       {abaAtiva === 'pendentes' ? (
         <div style={styles.reservasContainer}>
-          <div style={styles.filtroContainer}>
-            <input
-              type="text"
-              placeholder="Buscar por nome, telefone ou ID"
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              style={styles.buscaInput}
-            />
-            <select
-              style={styles.filtroSelect}
-              value={filtroCupom}
-              onChange={(e) => setFiltroCupom(e.target.value)}
-            >
-              <option value="">Todos os Cupons</option>
-              {cupons.map((cupom, index) => (
-                <option key={index} value={cupom.nome}>
-                  {cupom.nome} ({cupom.desconto}%)
-                </option>
-              ))}
-            </select>
-          </div>
-
           {reservasPendentes.length === 0 ? (
             <p style={styles.semReservas}>Nenhuma reserva pendente.</p>
           ) : (
@@ -251,26 +256,7 @@ const Admin = () => {
         </div>
       ) : (
         <div style={styles.reservasContainer}>
-          <div style={styles.filtroContainer}>
-            <input
-              type="text"
-              placeholder="Buscar por nome, telefone ou ID"
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              style={styles.buscaInput}
-            />
-            <select
-              style={styles.filtroSelect}
-              value={filtroCupom}
-              onChange={(e) => setFiltroCupom(e.target.value)}
-            >
-              <option value="">Todos os Cupons</option>
-              {cupons.map((cupom, index) => (
-                <option key={index} value={cupom.nome}>
-                  {cupom.nome} ({cupom.desconto}%)
-                </option>
-              ))}
-            </select>
+          <div style={styles.exportButtonsContainer}>
             <button style={styles.exportButton} onClick={exportarPDF}>
               Exportar PDF
             </button>
@@ -299,49 +285,82 @@ const Admin = () => {
 const styles = {
   container: {
     maxWidth: '800px',
+    width: '100%',
     margin: '0 auto',
     padding: '20px',
     backgroundColor: '#FFF8DC',
     borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    boxSizing: 'border-box'
   },
   title: {
     textAlign: 'center',
     color: '#8B4513',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    fontSize: '24px'
   },
   filtroContainer: {
     display: 'flex',
+    flexDirection: 'column',
     gap: '10px',
-    marginBottom: '20px',
-    alignItems: 'center'
+    marginBottom: '20px'
+  },
+  searchContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    position: 'relative',
+    width: '100%'
   },
   buscaInput: {
-    padding: '8px 12px',
-    fontSize: '14px',
+    padding: '10px 40px 10px 12px',
+    fontSize: '16px',
     border: '1px solid #8B4513',
     borderRadius: '5px',
     backgroundColor: '#FFF8DC',
     color: '#8B4513',
-    flex: 2
+    width: '100%',
+    boxSizing: 'border-box'
+  },
+  searchButton: {
+    position: 'absolute',
+    right: '5px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    color: '#8B4513',
+    cursor: 'pointer',
+    padding: '5px'
   },
   filtroSelect: {
-    padding: '8px 12px',
-    fontSize: '14px',
+    padding: '10px 12px',
+    fontSize: '16px',
     border: '1px solid #8B4513',
     borderRadius: '5px',
     backgroundColor: '#FFF8DC',
     color: '#8B4513',
-    flex: 1
+    width: '100%',
+    boxSizing: 'border-box'
+  },
+  exportButtonsContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '10px'
   },
   exportButton: {
-    padding: '8px 12px',
-    fontSize: '14px',
+    padding: '10px 15px',
+    fontSize: '16px',
     backgroundColor: '#87CEEB',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    flex: '1 0 auto',
+    textAlign: 'center',
+    minWidth: '120px',
     '&:hover': {
       backgroundColor: '#6CA6CD'
     }
@@ -350,7 +369,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     gap: '10px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    flexWrap: 'wrap'
   },
   tab: {
     padding: '10px 20px',
@@ -360,6 +380,9 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    flex: '1 0 auto',
+    minWidth: '150px',
+    textAlign: 'center',
     '&:hover': {
       backgroundColor: '#A0522D'
     }
@@ -371,7 +394,10 @@ const styles = {
     color: 'white',
     border: 'none',
     borderRadius: '5px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    flex: '1 0 auto',
+    minWidth: '150px',
+    textAlign: 'center'
   },
   reservasContainer: {
     display: 'flex',

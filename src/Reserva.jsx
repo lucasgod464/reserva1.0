@@ -229,17 +229,20 @@ const Reserva = () => {
 const styles = {
   container: {
     maxWidth: '600px',
+    width: '100%',
     margin: '40px auto',
     padding: '20px',
     backgroundColor: '#F5F5DC',
     borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    boxSizing: 'border-box'
   },
   title: {
     textAlign: 'left',
     color: '#8B4513',
     marginBottom: '20px',
-    paddingLeft: '10px'
+    paddingLeft: '10px',
+    fontSize: '24px'
   },
   button: {
     padding: '15px',

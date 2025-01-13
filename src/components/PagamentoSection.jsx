@@ -83,7 +83,7 @@ const PagamentoSection = ({
             {mostrarAviso && (
               <div style={styles.aviso}>
                 <span style={styles.avisoIcon}>✅</span>
-                Chave PIX copiada! Abra seu app de pagamentos para continuar.
+                Chave PIX copiada!
               </div>
             )}
           </div>
@@ -156,13 +156,14 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '30px',
+    minWidth: '30px',
     height: '30px',
     borderRadius: '50%',
     backgroundColor: '#8B4513',
     color: 'white',
     fontWeight: 'bold',
-    fontSize: '18px'
+    fontSize: '18px',
+    flexShrink: 0
   },
   passoConteudo: {
     flex: 1
@@ -193,16 +194,18 @@ const styles = {
   pixInputContainer: {
     display: 'flex',
     alignItems: 'center',
-    marginTop: '10px'
+    marginTop: '10px',
+    flexWrap: 'wrap',
+    gap: '10px'
   },
   pixInput: {
-    flex: 1,
+    flex: '1 1 200px',
     padding: '10px',
     fontSize: '16px',
     color: '#8B4513',
     backgroundColor: 'white',
     border: '1px solid #8B4513',
-    borderRadius: '5px 0 0 5px',
+    borderRadius: '5px',
     cursor: 'text'
   },
   copyButton: {
@@ -211,7 +214,7 @@ const styles = {
     color: 'white',
     backgroundColor: '#8B4513',
     border: 'none',
-    borderRadius: '0 5px 5px 0',
+    borderRadius: '5px',
     cursor: 'pointer',
     '&:hover': {
       backgroundColor: '#A0522D'
