@@ -1,0 +1,91 @@
+/* ReservaForm.css */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 10px;
+}
+
+.inputGroupDestaque {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 15px;
+  background-color: #FFF8DC;
+  border: 2px solid #8B4513;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.label {
+  font-size: 14px;
+  color: #8B4513;
+}
+
+.input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #8B4513;
+  border-radius: 5px;
+  background-color: #FFF8DC;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #8B4513;
+}
+
+.cupomContainer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.mostrarCupomButton {
+  padding: 8px 15px;
+  font-size: 14px;
+  color: #8B4513;
+  background-color: transparent;
+  border: 1px solid #8B4513;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #FFF8DC;
+  }
+}
+
+.cupomInputGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.cupomInput {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #8B4513;
+  border-radius: 5px;
+  background-color: #FFF8DC;
+}
+
+.cupomButton {
+  padding: 8px 15px;
+  font-size: 14px;
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #A0522D;
+  }
+}

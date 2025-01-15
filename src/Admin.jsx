@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import './Admin.css';
 import Notification from './components/Notification';
 
 const Admin = () => {
@@ -23,6 +24,8 @@ const Admin = () => {
   const [tituloPopup, setTituloPopup] = useState('Bem-vindo ao Rodízio!');
   const [descricaoPopup, setDescricaoPopup] = useState('Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
   const [popupAtivo, setPopupAtivo] = useState(true);
+  const [mapCenter, setMapCenter] = useState([-23.5505, -46.6333]);
+  const [mapZoom, setMapZoom] = useState(12);
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -58,6 +61,8 @@ const Admin = () => {
       setTituloPopup(data.titulo_popup || 'Bem-vindo ao Rodízio!');
       setDescricaoPopup(data.descricao_popup || 'Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
       setPopupAtivo(data.popup_ativo !== undefined ? data.popup_ativo : true);
+      setMapCenter(data.map_center || [-23.5505, -46.6333]);
+      setMapZoom(data.map_zoom || 12);
     }
   };
 
@@ -144,7 +149,9 @@ const Admin = () => {
         cupons: cupons,
         titulo_popup: tituloPopup,
         descricao_popup: descricaoPopup,
-        popup_ativo: popupAtivo
+        popup_ativo: popupAtivo,
+        map_center: mapCenter,
+        map_zoom: mapZoom
       });
 
     if (!error) {
@@ -172,10 +179,9 @@ const Admin = () => {
   const reservasAprovadas = filtrarReservas(reservas.filter((reserva) => reserva.aprovada));
 
   return (
-    <div style={styles.container}>
+    <div className="container">
       {notification && <Notification message={notification.message} type={notification.type} />}
-      <h1 style={styles.title}>Painel de Administração</h1>
-
+      <h1 className="title">Painel de Administração</h1>
       <ConfiguracaoForm
         precoAdulto={precoAdulto}
         precoCrianca={precoCrianca}
@@ -195,38 +201,40 @@ const Admin = () => {
         setDescricaoPopup={setDescricaoPopup}
         setPopupAtivo={setPopupAtivo}
         salvarConfiguracoes={salvarConfiguracoes}
+        mapCenter={mapCenter}
+        mapZoom={mapZoom}
+        setMapCenter={setMapCenter}
+        setMapZoom={setMapZoom}
       />
-
-      <div style={styles.tabsContainer}>
+      <div className="tabsContainer">
         <button
-          style={abaAtiva === 'pendentes' ? styles.tabAtiva : styles.tab}
+          className={abaAtiva === 'pendentes' ? 'tabAtiva' : 'tab'}
           onClick={() => setAbaAtiva('pendentes')}
         >
           Reservas Pendentes
         </button>
         <button
-          style={abaAtiva === 'aprovadas' ? styles.tabAtiva : styles.tab}
+          className={abaAtiva === 'aprovadas' ? 'tabAtiva' : 'tab'}
           onClick={() => setAbaAtiva('aprovadas')}
         >
           Reservas Aprovadas
         </button>
       </div>
-
-      <div style={styles.filtroContainer}>
-        <div style={styles.searchContainer}>
+      <div className="filtroContainer">
+        <div className="searchContainer">
           <input
             type="text"
             placeholder="Buscar por nome, telefone ou ID"
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
-            style={styles.buscaInput}
+            className="buscaInput"
           />
-          <button style={styles.searchButton} onClick={() => setTermoBusca('')}>
+          <button className="searchButton" onClick={() => setTermoBusca('')}>
             {termoBusca ? '✕' : '🔍'}
           </button>
         </div>
         <select
-          style={styles.filtroSelect}
+          className="filtroSelect"
           value={filtroCupom}
           onChange={(e) => setFiltroCupom(e.target.value)}
         >
@@ -238,11 +246,10 @@ const Admin = () => {
           ))}
         </select>
       </div>
-
       {abaAtiva === 'pendentes' ? (
-        <div style={styles.reservasContainer}>
+        <div className="reservasContainer">
           {reservasPendentes.length === 0 ? (
-            <p style={styles.semReservas}>Nenhuma reserva pendente.</p>
+            <p className="semReservas">Nenhuma reserva pendente.</p>
           ) : (
             reservasPendentes.map((reserva, index) => (
               <ReservaCard
@@ -255,18 +262,17 @@ const Admin = () => {
           )}
         </div>
       ) : (
-        <div style={styles.reservasContainer}>
-          <div style={styles.exportButtonsContainer}>
-            <button style={styles.exportButton} onClick={exportarPDF}>
+        <div className="reservasContainer">
+          <div className="exportButtonsContainer">
+            <button className="exportButton" onClick={exportarPDF}>
               Exportar PDF
             </button>
-            <button style={styles.exportButton} onClick={exportarXLS}>
+            <button className="exportButton" onClick={exportarXLS}>
               Exportar XLS
             </button>
           </div>
-
           {reservasAprovadas.length === 0 ? (
-            <p style={styles.semReservas}>Nenhuma reserva aprovada.</p>
+            <p className="semReservas">Nenhuma reserva aprovada.</p>
           ) : (
             reservasAprovadas.map((reserva, index) => (
               <ReservaCard
@@ -280,135 +286,6 @@ const Admin = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '800px',
-    width: '100%',
-    margin: '0 auto',
-    padding: '20px',
-    backgroundColor: '#FFF8DC',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    boxSizing: 'border-box'
-  },
-  title: {
-    textAlign: 'center',
-    color: '#8B4513',
-    marginBottom: '20px',
-    fontSize: '24px'
-  },
-  filtroContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    marginBottom: '20px'
-  },
-  searchContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    position: 'relative',
-    width: '100%'
-  },
-  buscaInput: {
-    padding: '10px 40px 10px 12px',
-    fontSize: '16px',
-    border: '1px solid #8B4513',
-    borderRadius: '5px',
-    backgroundColor: '#FFF8DC',
-    color: '#8B4513',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  searchButton: {
-    position: 'absolute',
-    right: '5px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    fontSize: '20px',
-    color: '#8B4513',
-    cursor: 'pointer',
-    padding: '5px'
-  },
-  filtroSelect: {
-    padding: '10px 12px',
-    fontSize: '16px',
-    border: '1px solid #8B4513',
-    borderRadius: '5px',
-    backgroundColor: '#FFF8DC',
-    color: '#8B4513',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  exportButtonsContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-    gap: '10px'
-  },
-  exportButton: {
-    padding: '10px 15px',
-    fontSize: '16px',
-    backgroundColor: '#87CEEB',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    flex: '1 0 auto',
-    textAlign: 'center',
-    minWidth: '120px',
-    '&:hover': {
-      backgroundColor: '#6CA6CD'
-    }
-  },
-  tabsContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-    marginBottom: '20px',
-    flexWrap: 'wrap'
-  },
-  tab: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#8B4513',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    flex: '1 0 auto',
-    minWidth: '150px',
-    textAlign: 'center',
-    '&:hover': {
-      backgroundColor: '#A0522D'
-    }
-  },
-  tabAtiva: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#A0522D',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    flex: '1 0 auto',
-    minWidth: '150px',
-    textAlign: 'center'
-  },
-  reservasContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  semReservas: {
-    textAlign: 'center',
-    color: '#8B4513',
-    fontSize: '18px'
-  }
 };
 
 export default Admin;

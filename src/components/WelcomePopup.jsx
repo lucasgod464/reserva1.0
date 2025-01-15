@@ -1,15 +1,19 @@
 import React from 'react';
 
 const WelcomePopup = ({ onClose, titulo, descricao }) => {
+  // Preserve whitespace
+  const paragraphs = descricao.split('\n').map((paragraph, index) => (
+    <pre key={index} style={styles.description}>
+      {paragraph}
+    </pre>
+  ));
+
   return (
     <div style={styles.overlay}>
       <div style={styles.popup}>
         <h2 style={styles.title}>{titulo}</h2>
-        <p style={styles.description}>{descricao}</p>
-        <button 
-          style={styles.button}
-          onClick={onClose}
-        >
+        <div style={styles.descriptionContainer}>{paragraphs}</div>
+        <button style={styles.button} onClick={onClose}>
           Fechar
         </button>
       </div>
@@ -36,16 +40,22 @@ const styles = {
     borderRadius: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     maxWidth: '400px',
-    textAlign: 'center'
+    textAlign: 'left'
   },
   title: {
     color: '#8B4513',
-    marginBottom: '15px'
+    marginBottom: '15px',
+    textAlign: 'center'
   },
-  description: {
+  descriptionContainer: {
     color: '#8B4513',
     marginBottom: '20px',
-    lineHeight: '1.5'
+    lineHeight: '1.5',
+    fontFamily: 'monospace' // Use monospace font to preserve spacing
+  },
+  description: {
+    margin: '0', // Remove default margin from <pre>
+    whiteSpace: 'pre-wrap' // Allow line breaks within the <pre> element
   },
   button: {
     padding: '10px 20px',
@@ -55,6 +65,8 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    display: 'block',
+    margin: '0 auto',
     '&:hover': {
       backgroundColor: '#A0522D'
     }

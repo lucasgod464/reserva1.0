@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './lib/supabaseClient';
 import ReservaForm from './components/ReservaForm';
 import PagamentoSection from './components/PagamentoSection';
 import PixPopup from './components/PixPopup';
-import Notification from './components/Notification';
 import WelcomePopup from './components/WelcomePopup';
+import './Reserva.css';
+import Map from './components/Map';
 
 const Reserva = () => {
   const [pessoas, setPessoas] = useState(1);
@@ -25,6 +26,7 @@ const Reserva = () => {
   const [popupAtivo, setPopupAtivo] = useState(true);
   const [tituloPopup, setTituloPopup] = useState('');
   const [descricaoPopup, setDescricaoPopup] = useState('');
+  const [mapConfig, setMapConfig] = useState({ center: [-23.5505, -46.6333], zoom: 12 });
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -50,6 +52,7 @@ const Reserva = () => {
       setDescricaoPopup(data.descricao_popup || 'Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
       setPopupAtivo(data.popup_ativo);
       setShowWelcomePopup(data.popup_ativo);
+      setMapConfig({ center: data.map_center || [-23.5505, -46.6333], zoom: data.map_zoom || 12 });
     }
   }
 
@@ -103,7 +106,6 @@ const Reserva = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validação dos campos
     const nomesPreenchidos = nomes.every(nome => nome.trim() !== '');
     if (!nomesPreenchidos) {
       showNotification('Preencha todos os nomes', 'error');
@@ -178,8 +180,12 @@ const Reserva = () => {
   };
 
   return (
-    <div style={styles.container}>
-      {notification && <Notification message={notification.message} type={notification.type} />}
+    <div className="container">
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
       {showWelcomePopup && popupAtivo && (
         <WelcomePopup 
           onClose={() => setShowWelcomePopup(false)}
@@ -187,9 +193,7 @@ const Reserva = () => {
           descricao={descricaoPopup}
         />
       )}
-      
-      <h1 style={styles.title}>Fazer Reserva</h1>
-      
+      <h1 className="title">Fazer Reserva</h1>
       <ReservaForm
         pessoas={pessoas}
         nomes={nomes}
@@ -204,7 +208,6 @@ const Reserva = () => {
         handleCupomChange={handleCupomChange}
         aplicarCupom={aplicarCupom}
       />
-
       <PagamentoSection
         chavepix={chavepix}
         tipo_chavepix={tipo_chavepix}
@@ -213,9 +216,8 @@ const Reserva = () => {
         mostrarAviso={mostrarAviso}
         handleComprovanteChange={handleComprovanteChange}
       />
-
-      <button type="submit" style={styles.button} onClick={handleSubmit}>Finalizar Reserva</button>
-
+      <button type="submit" className="button" onClick={handleSubmit}>Finalizar Reserva</button>
+      <Map config={mapConfig} />
       {mostrarPopupPix && (
         <PixPopup
           valorTotal={valorTotal}
@@ -224,40 +226,6 @@ const Reserva = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    width: '100%',
-    margin: '40px auto',
-    padding: '20px',
-    backgroundColor: '#F5F5DC',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    boxSizing: 'border-box'
-  },
-  title: {
-    textAlign: 'left',
-    color: '#8B4513',
-    marginBottom: '20px',
-    paddingLeft: '10px',
-    fontSize: '24px'
-  },
-  button: {
-    padding: '15px',
-    fontSize: '16px',
-    backgroundColor: '#8B4513',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    width: '100%',
-    marginTop: '20px',
-    '&:hover': {
-      backgroundColor: '#A0522D'
-    }
-  }
 };
 
 export default Reserva;

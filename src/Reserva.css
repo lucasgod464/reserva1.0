@@ -1,0 +1,69 @@
+/* src/Reserva.css */
+.container {
+  max-width: 600px;
+  width: 100%;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #F5F5DC;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.title {
+  text-align: left;
+  color: #8B4513;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  font-size: 24px;
+}
+
+.button {
+  padding: 15px;
+  font-size: 16px;
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+  &:hover {
+    background-color: #A0522D;
+  }
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: #fff;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+  max-width: 90%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notification.success {
+  background-color: #28a745;
+  text-align: center;
+}
+
+.notification.error {
+  background-color: #dc3545;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+}
