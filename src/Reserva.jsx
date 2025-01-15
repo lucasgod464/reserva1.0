@@ -25,6 +25,7 @@ const Reserva = () => {
   const [popupAtivo, setPopupAtivo] = useState(true);
   const [tituloPopup, setTituloPopup] = useState('');
   const [descricaoPopup, setDescricaoPopup] = useState('');
+  const endereco = 'Rua Juiz David Barrilli, 376 - Jardim Aquarius, São José dos Campos - SP, 12246-200';
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -103,7 +104,6 @@ const Reserva = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validação dos campos
     const nomesPreenchidos = nomes.every(nome => nome.trim() !== '');
     if (!nomesPreenchidos) {
       showNotification('Preencha todos os nomes', 'error');
@@ -177,19 +177,95 @@ const Reserva = () => {
     setMostrarPopupPix(false);
   };
 
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(endereco)
+      .then(() => showNotification('Endereço copiado para a área de transferência!', 'success'))
+      .catch(err => showNotification('Erro ao copiar endereço: ' + err, 'error'));
+  };
+
+  const handleOpenMaps = () => {
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`, '_blank');
+  };
+
+  const styles = {
+    container: {
+      maxWidth: '600px',
+      width: '100%',
+      margin: '40px auto',
+      padding: '20px',
+      backgroundColor: '#F5F5DC',
+      borderRadius: '10px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      boxSizing: 'border-box'
+    },
+    title: {
+      textAlign: 'left',
+      color: '#8B4513',
+      marginBottom: '20px',
+      paddingLeft: '10px',
+      fontSize: '24px'
+    },
+    button: {
+      padding: '15px',
+      fontSize: '16px',
+      backgroundColor: '#8B4513',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      width: '100%',
+      marginTop: '20px',
+      '&:hover': {
+        backgroundColor: '#A0522D'
+      }
+    },
+    addressContainer: {
+      marginTop: '20px',
+      textAlign: 'center'
+    },
+    addressTitle: {
+      fontSize: '18px',
+      color: '#8B4513',
+      marginBottom: '10px',
+      fontWeight: 'bold'
+    },
+    addressText: {
+      fontSize: '16px',
+      color: '#8B4513',
+      marginBottom: '10px'
+    },
+    addressButtons: {
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '10px'
+    },
+    addressButton: {
+      padding: '8px 15px',
+      fontSize: '14px',
+      backgroundColor: '#8B4513',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      '&:hover': {
+        backgroundColor: '#A0522D'
+      }
+    }
+  };
+
   return (
     <div style={styles.container}>
       {notification && <Notification message={notification.message} type={notification.type} />}
       {showWelcomePopup && popupAtivo && (
-        <WelcomePopup 
+        <WelcomePopup
           onClose={() => setShowWelcomePopup(false)}
           titulo={tituloPopup}
           descricao={descricaoPopup}
         />
       )}
-      
+
       <h1 style={styles.title}>Fazer Reserva</h1>
-      
+
       <ReservaForm
         pessoas={pessoas}
         nomes={nomes}
@@ -216,6 +292,15 @@ const Reserva = () => {
 
       <button type="submit" style={styles.button} onClick={handleSubmit}>Finalizar Reserva</button>
 
+      <div style={styles.addressContainer}>
+        <h3 style={styles.addressTitle}>Local do Rodízio</h3>
+        <p style={styles.addressText}>Endereço: {endereco}</p>
+        <div style={styles.addressButtons}>
+          <button style={styles.addressButton} onClick={handleOpenMaps}>Abrir no Google Maps</button>
+          <button style={styles.addressButton} onClick={handleCopyAddress}>Copiar Endereço</button>
+        </div>
+      </div>
+
       {mostrarPopupPix && (
         <PixPopup
           valorTotal={valorTotal}
@@ -224,40 +309,6 @@ const Reserva = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    width: '100%',
-    margin: '40px auto',
-    padding: '20px',
-    backgroundColor: '#F5F5DC',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    boxSizing: 'border-box'
-  },
-  title: {
-    textAlign: 'left',
-    color: '#8B4513',
-    marginBottom: '20px',
-    paddingLeft: '10px',
-    fontSize: '24px'
-  },
-  button: {
-    padding: '15px',
-    fontSize: '16px',
-    backgroundColor: '#8B4513',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    width: '100%',
-    marginTop: '20px',
-    '&:hover': {
-      backgroundColor: '#A0522D'
-    }
-  }
 };
 
 export default Reserva;
