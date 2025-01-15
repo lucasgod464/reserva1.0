@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Reserva from './Reserva';
 import Admin from './Admin';
+import { supabase } from './lib/supabaseClient';
 
 const NavBar = () => {
   const location = useLocation();
 
-  // Mostra a barra de navegação APENAS na rota /admin
   if (location.pathname !== '/admin') {
     return null;
   }
@@ -19,17 +19,34 @@ const NavBar = () => {
   );
 };
 
-export default function App() {
+const App = () => {
+  const [fontSizePopup, setFontSizePopup] = useState(16); // Add state for font size
+
+  useEffect(() => {
+    fetchFontSize();
+  }, []);
+
+  const fetchFontSize = async () => {
+    const { data, error } = await supabase
+      .from('configuracoes')
+      .select('fontSizePopup')
+      .single();
+
+    if (!error && data) {
+      setFontSizePopup(data.fontSizePopup);
+    }
+  };
+
   return (
     <Router>
       <NavBar />
       <Routes>
-        <Route path="/" element={<Reserva />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/" element={<Reserva fontSize={fontSizePopup} />} /> {/* Pass fontSize to Reserva */}
+        <Route path="/admin" element={<Admin setFontSizePopup={setFontSizePopup} />} /> {/* Pass function to Admin */}
       </Routes>
     </Router>
   );
-}
+};
 
 const styles = {
   nav: {
@@ -38,7 +55,7 @@ const styles = {
     gap: '20px',
     marginBottom: '20px',
     padding: '10px',
-    backgroundColor: '#8B4513' // Marrom terracota
+    backgroundColor: '#8B4513' 
   },
   link: {
     color: 'white',
@@ -49,3 +66,5 @@ const styles = {
     }
   }
 };
+
+export default App;

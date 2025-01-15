@@ -8,7 +8,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import Notification from './components/Notification';
 
-const Admin = () => {
+const Admin = ({ setFontSizePopup }) => {
   const [reservas, setReservas] = useState([]);
   const [precoAdulto, setPrecoAdulto] = useState(69.90);
   const [precoCrianca, setPrecoCrianca] = useState(34.95);
@@ -23,6 +23,7 @@ const Admin = () => {
   const [tituloPopup, setTituloPopup] = useState('Bem-vindo ao Rodízio!');
   const [descricaoPopup, setDescricaoPopup] = useState('Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
   const [popupAtivo, setPopupAtivo] = useState(true);
+  const [fontsizepopup, setFontSizePopupState] = useState(16); // Changed to lowercase
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
@@ -58,6 +59,7 @@ const Admin = () => {
       setTituloPopup(data.titulo_popup || 'Bem-vindo ao Rodízio!');
       setDescricaoPopup(data.descricao_popup || 'Estamos felizes em tê-lo conosco. Aproveite nossa seleção de carnes e acompanhamentos.');
       setPopupAtivo(data.popup_ativo !== undefined ? data.popup_ativo : true);
+      setFontSizePopupState(data.fontsizepopup || 16); // Changed to lowercase
     }
   };
 
@@ -66,7 +68,7 @@ const Admin = () => {
     const doc = new jsPDF();
 
     const headers = [['Nome', 'Tipo', 'Valor Adulto', 'Valor Criança']];
-    const data = reservasFiltradas.flatMap(reserva => 
+    const data = reservasFiltradas.flatMap(reserva =>
       reserva.nomes.map((nome, index) => [
         nome,
         reserva.criancas[index] ? 'Criança' : 'Adulto',
@@ -98,7 +100,7 @@ const Admin = () => {
 
   const exportarXLS = () => {
     const reservasFiltradas = filtrarReservas(reservasAprovadas);
-    const data = reservasFiltradas.flatMap(reserva => 
+    const data = reservasFiltradas.flatMap(reserva =>
       reserva.nomes.map((nome, index) => ({
         Nome: nome,
         Tipo: reserva.criancas[index] ? 'Criança' : 'Adulto',
@@ -135,16 +137,17 @@ const Admin = () => {
   const salvarConfiguracoes = async () => {
     const { error } = await supabase
       .from('configuracoes')
-      .upsert({ 
-        id: 1, 
-        adulto: precoAdulto, 
+      .upsert({
+        id: 1,
+        adulto: precoAdulto,
         crianca: precoCrianca,
         chave_pix: chavePix,
         tipo_chave_pix: tipoChavePix,
         cupons: cupons,
         titulo_popup: tituloPopup,
         descricao_popup: descricaoPopup,
-        popup_ativo: popupAtivo
+        popup_ativo: popupAtivo,
+        fontsizepopup: fontsizepopup // Changed to lowercase
       });
 
     if (!error) {
@@ -171,6 +174,135 @@ const Admin = () => {
   const reservasPendentes = filtrarReservas(reservas.filter((reserva) => !reserva.aprovada));
   const reservasAprovadas = filtrarReservas(reservas.filter((reserva) => reserva.aprovada));
 
+  const styles = {
+    container: {
+      maxWidth: '800px',
+      width: '100%',
+      margin: '0 auto',
+      padding: '20px',
+      backgroundColor: '#FFF8DC',
+      borderRadius: '10px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      boxSizing: 'border-box'
+    },
+    title: {
+      textAlign: 'center',
+      color: '#8B4513',
+      marginBottom: '20px',
+      fontSize: '24px'
+    },
+    tabsContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '10px',
+      marginBottom: '20px',
+      flexWrap: 'wrap'
+    },
+    tab: {
+      padding: '10px 20px',
+      fontSize: '16px',
+      backgroundColor: '#8B4513',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      flex: '1 0 auto',
+      minWidth: '150px',
+      textAlign: 'center',
+      '&:hover': {
+        backgroundColor: '#A0522D'
+      }
+    },
+    tabAtiva: {
+      padding: '10px 20px',
+      fontSize: '16px',
+      backgroundColor: '#A0522D',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      flex: '1 0 auto',
+      minWidth: '150px',
+      textAlign: 'center'
+    },
+    reservasContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '20px'
+    },
+    semReservas: {
+      textAlign: 'center',
+      color: '#8B4513',
+      fontSize: '18px'
+    },
+    filtroContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px',
+      marginBottom: '20px'
+    },
+    searchContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      width: '100%'
+    },
+    buscaInput: {
+      padding: '10px 40px 10px 12px',
+      fontSize: '16px',
+      border: '1px solid #8B4513',
+      borderRadius: '5px',
+      backgroundColor: '#FFF8DC',
+      color: '#8B4513',
+      width: '100%',
+      boxSizing: 'border-box'
+    },
+    searchButton: {
+      position: 'absolute',
+      right: '5px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      background: 'none',
+      border: 'none',
+      fontSize: '20px',
+      color: '#8B4513',
+      cursor: 'pointer',
+      padding: '5px'
+    },
+    filtroSelect: {
+      padding: '10px 12px',
+      fontSize: '16px',
+      border: '1px solid #8B4513',
+      borderRadius: '5px',
+      backgroundColor: '#FFF8DC',
+      color: '#8B4513',
+      width: '100%',
+      boxSizing: 'border-box'
+    },
+    exportButtonsContainer: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '20px',
+      flexWrap: 'wrap',
+      gap: '10px'
+    },
+    exportButton: {
+      padding: '10px 15px',
+      fontSize: '16px',
+      backgroundColor: '#87CEEB',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      flex: '1 0 auto',
+      textAlign: 'center',
+      minWidth: '120px',
+      '&:hover': {
+        backgroundColor: '#6CA6CD'
+      }
+    }
+  };
+
   return (
     <div style={styles.container}>
       {notification && <Notification message={notification.message} type={notification.type} />}
@@ -186,6 +318,7 @@ const Admin = () => {
         tituloPopup={tituloPopup}
         descricaoPopup={descricaoPopup}
         popupAtivo={popupAtivo}
+        fontsizepopup={fontsizepopup} // Changed to lowercase
         setPrecoAdulto={setPrecoAdulto}
         setPrecoCrianca={setPrecoCrianca}
         setChavePix={setChavePix}
@@ -194,6 +327,7 @@ const Admin = () => {
         setTituloPopup={setTituloPopup}
         setDescricaoPopup={setDescricaoPopup}
         setPopupAtivo={setPopupAtivo}
+        setFontSizePopup={setFontSizePopupState}
         salvarConfiguracoes={salvarConfiguracoes}
       />
 
@@ -280,135 +414,6 @@ const Admin = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '800px',
-    width: '100%',
-    margin: '0 auto',
-    padding: '20px',
-    backgroundColor: '#FFF8DC',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    boxSizing: 'border-box'
-  },
-  title: {
-    textAlign: 'center',
-    color: '#8B4513',
-    marginBottom: '20px',
-    fontSize: '24px'
-  },
-  filtroContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    marginBottom: '20px'
-  },
-  searchContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    position: 'relative',
-    width: '100%'
-  },
-  buscaInput: {
-    padding: '10px 40px 10px 12px',
-    fontSize: '16px',
-    border: '1px solid #8B4513',
-    borderRadius: '5px',
-    backgroundColor: '#FFF8DC',
-    color: '#8B4513',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  searchButton: {
-    position: 'absolute',
-    right: '5px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    fontSize: '20px',
-    color: '#8B4513',
-    cursor: 'pointer',
-    padding: '5px'
-  },
-  filtroSelect: {
-    padding: '10px 12px',
-    fontSize: '16px',
-    border: '1px solid #8B4513',
-    borderRadius: '5px',
-    backgroundColor: '#FFF8DC',
-    color: '#8B4513',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  exportButtonsContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-    gap: '10px'
-  },
-  exportButton: {
-    padding: '10px 15px',
-    fontSize: '16px',
-    backgroundColor: '#87CEEB',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    flex: '1 0 auto',
-    textAlign: 'center',
-    minWidth: '120px',
-    '&:hover': {
-      backgroundColor: '#6CA6CD'
-    }
-  },
-  tabsContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-    marginBottom: '20px',
-    flexWrap: 'wrap'
-  },
-  tab: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#8B4513',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    flex: '1 0 auto',
-    minWidth: '150px',
-    textAlign: 'center',
-    '&:hover': {
-      backgroundColor: '#A0522D'
-    }
-  },
-  tabAtiva: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#A0522D',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    flex: '1 0 auto',
-    minWidth: '150px',
-    textAlign: 'center'
-  },
-  reservasContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  semReservas: {
-    textAlign: 'center',
-    color: '#8B4513',
-    fontSize: '18px'
-  }
 };
 
 export default Admin;
