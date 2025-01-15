@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './ReservaForm.css';
 
 const ReservaForm = ({ 
   pessoas, 
@@ -18,11 +17,11 @@ const ReservaForm = ({
   const [mostrarCupom, setMostrarCupom] = useState(false);
 
   return (
-    <form className="form">
-      <div className="inputGroup">
-        <label className="label">Número de Pessoas:</label>
+    <form style={styles.form}>
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Número de Pessoas:</label>
         <input
-          className="input"
+          style={styles.input}
           type="number"
           min="1"
           value={pessoas}
@@ -32,12 +31,12 @@ const ReservaForm = ({
       </div>
 
       {nomes.map((nome, index) => (
-        <div key={index} className={index === 0 ? "inputGroup" : "inputGroupDestaque"}>
-          <label className="label">
+        <div key={index} style={index === 0 ? styles.inputGroup : styles.inputGroupDestaque}>
+          <label style={styles.label}>
             {index === 0 ? 'Nome do Responsável:' : `Nome da Pessoa ${index + 1}:`}
           </label>
           <input
-            className="input"
+            style={styles.input}
             type="text"
             placeholder={index === 0 ? 'Nome do Responsável' : `Nome da Pessoa ${index + 1}`}
             value={nome}
@@ -45,7 +44,7 @@ const ReservaForm = ({
             required
           />
           {index > 0 && (
-            <label className="checkboxLabel">
+            <label style={styles.checkboxLabel}>
               <input
                 type="checkbox"
                 checked={criancas[index]}
@@ -57,10 +56,10 @@ const ReservaForm = ({
         </div>
       ))}
 
-      <div className="inputGroup">
-        <label className="label">Telefone:</label>
+      <div style={styles.inputGroup}>
+        <label style={styles.label}>Telefone:</label>
         <input
-          className="input"
+          style={styles.input}
           type="tel"
           placeholder="Telefone"
           value={telefone}
@@ -69,19 +68,19 @@ const ReservaForm = ({
         />
       </div>
 
-      <div className="cupomContainer">
+      <div style={styles.cupomContainer}>
         {!mostrarCupom ? (
           <button 
             type="button" 
-            className="mostrarCupomButton"
+            style={styles.mostrarCupomButton}
             onClick={() => setMostrarCupom(true)}
           >
             Tem um cupom de desconto?
           </button>
         ) : (
-          <div className="cupomInputGroup">
+          <div style={styles.cupomInputGroup}>
             <input
-              className="cupomInput"
+              style={styles.cupomInput}
               type="text"
               placeholder="Digite seu cupom"
               value={cupom}
@@ -89,7 +88,7 @@ const ReservaForm = ({
             />
             <button 
               type="button" 
-              className="cupomButton"
+              style={styles.cupomButton}
               onClick={aplicarCupom}
             >
               Aplicar
@@ -99,6 +98,89 @@ const ReservaForm = ({
       </div>
     </form>
   );
+};
+
+const styles = {
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px'
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px',
+    paddingLeft: '10px'
+  },
+  inputGroupDestaque: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px',
+    padding: '15px',
+    backgroundColor: '#FFF8DC',
+    border: '2px solid #8B4513',
+    borderRadius: '5px',
+    marginBottom: '10px'
+  },
+  label: {
+    fontSize: '14px',
+    color: '#8B4513'
+  },
+  input: {
+    padding: '12px',
+    fontSize: '16px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC'
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '14px',
+    color: '#8B4513'
+  },
+  cupomContainer: {
+    marginTop: '10px',
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  mostrarCupomButton: {
+    padding: '8px 15px',
+    fontSize: '14px',
+    color: '#8B4513',
+    backgroundColor: 'transparent',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#FFF8DC'
+    }
+  },
+  cupomInputGroup: {
+    display: 'flex',
+    gap: '10px'
+  },
+  cupomInput: {
+    flex: 1,
+    padding: '8px',
+    fontSize: '14px',
+    border: '1px solid #8B4513',
+    borderRadius: '5px',
+    backgroundColor: '#FFF8DC'
+  },
+  cupomButton: {
+    padding: '8px 15px',
+    fontSize: '14px',
+    backgroundColor: '#8B4513',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#A0522D'
+    }
+  }
 };
 
 export default ReservaForm;
