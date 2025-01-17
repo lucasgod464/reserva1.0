@@ -1,4 +1,5 @@
-{`import React, { useState } from 'react';
+```jsx
+import React, { useState } from 'react';
 import PrecosSection from './PrecosSection';
 import PixSection from './PixSection';
 import MensagemBoasVindasSection from './MensagemBoasVindasSection';
@@ -130,4 +131,5 @@ const ConfiguracaoForm = ({
 };
 
 export default ConfiguracaoForm;
-`}
+```
+```jsx

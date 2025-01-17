@@ -1,4 +1,5 @@
-{`import React from 'react';
+```jsx
+import React from 'react';
 
 const PrecosSection = ({ precoAdulto, precoCrianca, setPrecoAdulto, setPrecoCrianca, InputField }) => {
   const styles = {
@@ -26,7 +27,7 @@ const PrecosSection = ({ precoAdulto, precoCrianca, setPrecoAdulto, setPrecoCria
         onChange={(e) => setPrecoAdulto(parseFloat(e.target.value))}
       />
       <InputField
-        label="Preço para Criança:"
+        label="Crianças (6-10):"
         type="number"
         step="0.01"
         value={precoCrianca}
@@ -37,4 +38,5 @@ const PrecosSection = ({ precoAdulto, precoCrianca, setPrecoAdulto, setPrecoCria
 };
 
 export default PrecosSection;
-`}
+```
+```html
