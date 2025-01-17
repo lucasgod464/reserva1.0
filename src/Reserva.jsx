@@ -221,6 +221,7 @@ const Reserva = () => {
     },
     addressContainer: {
       marginTop: '20px',
+      marginBottom: '20px',
       textAlign: 'center'
     },
     addressTitle: {
@@ -281,6 +282,15 @@ const Reserva = () => {
         aplicarCupom={aplicarCupom}
       />
 
+      <div style={styles.addressContainer}>
+        <h3 style={styles.addressTitle}>Local do Rodízio</h3>
+        <p style={styles.addressText}>Endereço: {endereco}</p>
+        <div style={styles.addressButtons}>
+          <button style={styles.addressButton} onClick={handleOpenMaps}>Abrir no Google Maps</button>
+          <button style={styles.addressButton} onClick={handleCopyAddress}>Copiar Endereço</button>
+        </div>
+      </div>
+
       <PagamentoSection
         chavepix={chavepix}
         tipo_chavepix={tipo_chavepix}
@@ -291,15 +301,6 @@ const Reserva = () => {
       />
 
       <button type="submit" style={styles.button} onClick={handleSubmit}>Finalizar Reserva</button>
-
-      <div style={styles.addressContainer}>
-        <h3 style={styles.addressTitle}>Local do Rodízio</h3>
-        <p style={styles.addressText}>Endereço: {endereco}</p>
-        <div style={styles.addressButtons}>
-          <button style={styles.addressButton} onClick={handleOpenMaps}>Abrir no Google Maps</button>
-          <button style={styles.addressButton} onClick={handleCopyAddress}>Copiar Endereço</button>
-        </div>
-      </div>
 
       {mostrarPopupPix && (
         <PixPopup
